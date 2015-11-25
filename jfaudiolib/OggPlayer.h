@@ -17,7 +17,7 @@ protected:
 
     bool        bReleaseDS;             // release ds by ourselves?
 
-    LPDIRECTSOUND8
+    LPDIRECTSOUND
                 pDS;                    // the directsound 8 object
 
     LPDIRECTSOUNDBUFFER

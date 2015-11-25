@@ -303,6 +303,8 @@ struct user_defs
     char pwlockout[128],rtsname[128];
     char overhead_on,last_overhead,showweapons;
 
+    char disableCameras;
+
     short pause_on,from_bonus;
     short camerasprite,last_camsprite;
     short last_level,secretlevel;

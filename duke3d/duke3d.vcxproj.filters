@@ -1,0 +1,585 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="jfmact">
+      <UniqueIdentifier>{90be01b6-f011-40f0-b70f-711deebcfdca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jfaudiolib">
+      <UniqueIdentifier>{1346c886-9497-44d2-822c-831143892dec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jfbuild">
+      <UniqueIdentifier>{1d885e93-0a7d-4b46-86ad-cbb5528b3a11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jfduke3d">
+      <UniqueIdentifier>{980757a8-ff29-445b-a224-2d7cdb8ef46c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code">
+      <UniqueIdentifier>{4adc2f68-bd92-4601-819a-b072433a1ec4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\rocket">
+      <UniqueIdentifier>{5f4adba9-b662-4e5f-9f9a-4fbd86c4d9a9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\jfmact\_control.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\_scrplib.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\animlib.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\control.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\develop.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\file_lib.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\keyboard.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\mathutil.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\mouse.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\scriplib.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\types.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfmact\util_lib.h">
+      <Filter>jfmact</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\_midi.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\_multivc.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\asssys.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\cd.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\driver_directsound.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\driver_nosound.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\drivers.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\dsound_oggplayer.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\fx_man.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\linklist.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\ll_man.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\midi.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\midifuncs.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\multivoc.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\music.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\OggPlayer.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\pitch.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\sndcards.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfaudiolib\stdint.h">
+      <Filter>jfaudiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\a.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\baselayer.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\build.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\cache1d.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\common_build.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\compat.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\crc32.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\dxdidf.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\editor.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\engine_priv.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\glbuild.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\glext.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\hightile_priv.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\kplib.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\lz4.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\lz4_encoder.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\lzf.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\lzfP.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\lzwnew.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\md4.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\mdsprite_priv.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\mmulti.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\mmultimsgs.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\osd.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\polymost_priv.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\polymosttex_priv.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\polymosttexcache.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\pragmas.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\scriptfile.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfbuild\sdlayer.h">
+      <Filter>jfbuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\_functio.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\_rts.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\config.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\develop.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\duke3d.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\funct.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\function.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\gamedefs.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\GameListSource.game.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\grpscan.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\names.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\osdcmds.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\osdfuncs.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\rts.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\soundefs.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\jfduke3d\sounds.h">
+      <Filter>jfduke3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\crc32.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\csteam.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\dnAchievement.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\dnAPI.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\dnMulti.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\dnSnapshot.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\glguard.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\gui.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\gui_private.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\helpers.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\miniz.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\playvpx\playvpx.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\FrameAnimationDecorator.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\FrameAnimationDecoratorInstancer.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\PluginUtils.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\RocketAnimationPlugin.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\RocketMenuPlugin.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\ShellFileInterface.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\ShellOpenGL.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\ShellRenderInterfaceOpenGL.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\rocket\ShellSystemInterface.h">
+      <Filter>code\rocket</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\jfmact\animlib.c">
+      <Filter>jfmact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfmact\control.c">
+      <Filter>jfmact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfmact\file_lib.c">
+      <Filter>jfmact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfmact\keyboard.c">
+      <Filter>jfmact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfmact\mathutil.c">
+      <Filter>jfmact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfmact\mouse.c">
+      <Filter>jfmact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfmact\scriplib.c">
+      <Filter>jfmact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfmact\util_lib.c">
+      <Filter>jfmact</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\asssys.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\cd.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\driver_directsound.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\driver_nosound.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\drivers.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\dsound_oggplayer.cpp">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\fx_man.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\midi.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\mix.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\mixst.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\multivoc.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\music.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\OggPlayer.cpp">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\pitch.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfaudiolib\vorbis.c">
+      <Filter>jfaudiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\a-c.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\baselayer.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\cache1d.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\common_build.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\compat.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\crc32.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\defs.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\engine.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\glbuild.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\hightile.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\kplib.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\lz4.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\lzf_c.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\lzf_d.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\lzwnew.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\md4.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\mdsprite.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\mmulti_steam.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\osd.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\polymost.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\polymosttex.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\polymosttexcache.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\pragmas.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\scriptfile.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\sdlayer.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\smalltextfont.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfbuild\textfont.c">
+      <Filter>jfbuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\actors.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\build_icon.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\config.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\game.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\gamedef.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\global.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\grpscan.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\menues.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\osdcmds.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\osdfuncs.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\player.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\premap.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\rts.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\sector.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\sounds.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\testcd.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\jfduke3d\winbits.c">
+      <Filter>jfduke3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\base64.c">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\csteam.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\dnAchievement.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\dnAPI.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\dnAPI_globals.c">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\dnMulti.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\dnSnapshot.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\glguard.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\gui.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\gui_private.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\helpers.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\playvpx\playvpx.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\wintools.c">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rocket\FrameAnimationDecorator.cpp">
+      <Filter>code\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rocket\FrameAnimationDectoratorInstancer.cpp">
+      <Filter>code\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rocket\PluginUtils.cpp">
+      <Filter>code\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rocket\RocketAnimationPlugin.cpp">
+      <Filter>code\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rocket\RocketMenuPlugin.cpp">
+      <Filter>code\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rocket\ShellFileInterface.cpp">
+      <Filter>code\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rocket\ShellRenderInterfaceOpenGL.cpp">
+      <Filter>code\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\rocket\ShellSystemInterface.cpp">
+      <Filter>code\rocket</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

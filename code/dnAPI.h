@@ -55,6 +55,8 @@ void Sys_ThrottleFPS(int max_fps);
 void dnNewGame(GameDesc *gamedesc);
 void dnQuitGame();
 void dnHideMenu();
+int  dnNoModeSet();
+int  dnDemoModeSet();
 int  dnGameModeSet();
 int  dnMenuModeSet();
 void dnGetDefaultMode(VideoMode *vm);

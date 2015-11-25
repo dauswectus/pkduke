@@ -28,7 +28,7 @@ bool OggPlayer::InitDirectSound( HWND hWnd )
 {
 	HRESULT hr;
 	
-	if (FAILED(hr = DirectSoundCreate8(NULL, &pDS, NULL)))
+	if (FAILED(hr = DirectSoundCreate(NULL, &pDS, NULL)))
         return bInitialized = false;
 
 	pDS->Initialize(NULL);

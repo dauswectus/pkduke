@@ -436,7 +436,6 @@ void GUI::LoadDocuments() {
     LoadDocument("data/savegame.rml");
 	LoadDocument("data/skill.rml");
 	LoadDocument("data/episodes.rml");
-	LoadDocument("data/credits.rml");
 	LoadDocument("data/video.rml");
 	LoadDocument("data/game.rml");
 	LoadDocument("data/sound.rml");
@@ -505,7 +504,7 @@ void GUI::SetActionToConfirm(ConfirmableAction *action) {
     m_draw_strips = m_action_to_confirm != NULL;
 }
 
-GUI::GUI(int width, int height):m_enabled(false),m_width(width),m_height(height),m_enabled_for_current_frame(false),m_waiting_for_key(false),m_action_to_confirm(NULL),m_need_apply_video_mode(false),m_need_apply_vsync(false),m_show_press_enter(true),m_draw_strips(false),m_last_poll(0),m_join_on_launch(false) {
+GUI::GUI(int width, int height):m_enabled(false),m_width(width),m_height(height),m_enabled_for_current_frame(false),m_justStarted(true),m_waiting_for_key(false),m_action_to_confirm(NULL),m_need_apply_video_mode(false),m_need_apply_vsync(false),m_show_press_enter(false),m_draw_strips(false),m_last_poll(0),m_join_on_launch(false) {
     
 	
     for (int i = 1; i < _buildargc-1; i++) {
@@ -565,6 +564,8 @@ GUI::GUI(int width, int height):m_enabled(false),m_width(width),m_height(height)
     Rocket::Core::ElementDocument *doc = m_context->GetDocument("menu-main");
     Rocket::Core::Element *e = doc->GetElementById("version-footer");
     e->SetInnerRML(version_string);
+
+    InsertPKDuke3DCredits();
     
     menu_to_open = "menu-ingame";
     CSTEAM_SetNotificationCallback(NotificationCallback, this);
@@ -574,6 +575,37 @@ GUI::GUI(int width, int height):m_enabled(false),m_width(width),m_height(height)
 	m_workshopRequestManager = new WorkshopRequestManager();
 	
     exittotitle = 1;
+}
+
+void GUI::InsertPKDuke3DCredits() {
+    char pkDukeCreditsString[300];
+    sprintf(pkDukeCreditsString, "\n<h1>pkDuke3d</h1>\n<p>Alex <n>\"pogokeen\"</n> Dawson</p>\n<br /><p>Contributions (C) 2014, Alex Dawson</p>\n<p>pkDuke3d is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<\p>\n");
+    initprintf("Num docs: %d\n", m_context->GetNumDocuments());
+    
+    Rocket::Core::ElementDocument* creditsDoc = m_context->GetDocument("menu-credits");
+    if (!creditsDoc)
+    {
+        return;
+    }
+    Rocket::Core::Element* creditsBox = creditsDoc->GetLastChild();
+    if (!creditsBox)
+    {
+        return;
+    }
+    creditsBox = creditsBox->GetLastChild();
+    if (!creditsBox)
+    {
+        return;
+    }
+    Rocket::Core::Element* pkDukeCredits = creditsDoc->CreateElement("pkDukeCredits");
+    if (!pkDukeCredits)
+    {
+        return;
+    }
+
+    pkDukeCredits->SetInnerRML(pkDukeCreditsString);
+    creditsBox->AppendChild(pkDukeCredits);
+    pkDukeCredits->RemoveReference();
 }
 
 /*
@@ -1294,8 +1326,9 @@ void GUI::Render() {
     }
     
     CSTEAM_RunFrame();
-	Enable(dnMenuModeSet() && m_enabled_for_current_frame);
+    Enable((dnMenuModeSet() && (dnDemoModeSet() || m_enabled_for_current_frame)) || m_justStarted);
 	m_enabled_for_current_frame = false;
+    m_justStarted = false;
 	if (m_enabled) {
         GL_SetUIMode(m_width, m_height, m_menu_scale, m_menu_offset_x, m_menu_offset_y);
 
@@ -1364,8 +1397,9 @@ void GUI::Enable(bool v) {
 			if (dnGameModeSet()) {
 				m_context->GetDocument("menu-bg")->Hide();
 			} else {
-				Rocket::Core::ElementDocument *menubg = m_context->GetDocument("menu-bg");
-				menubg->Show();
+				//pogokeen: TODO: potentially show the background on a timer?
+				//Rocket::Core::ElementDocument *menubg = m_context->GetDocument("menu-bg");
+				//menubg->Show();
 			}
                         
             ResetMouse();
@@ -2055,8 +2089,6 @@ void GUI::PopulateOptions(Rocket::Core::Element *menu_item, Rocket::Core::Elemen
 
 void GUI::DidOpenMenuPage(Rocket::Core::ElementDocument *menu_page) {
 	Rocket::Core::String page_id(menu_page->GetId());
-    
-    intomenusounds();
     
     m_menu->UpdateFocus(m_context);
     

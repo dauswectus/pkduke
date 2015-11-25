@@ -56,7 +56,7 @@ Modifications for JonoF's port by Jonathon Fowler(jf@jonof.id.au)
 
 #include "_control.h"
 
-#define VERSION "1.3.2 STABLE"
+#define VERSION "pkDuke 1.3.2"
 
 #define HEAD   "Duke Nukem 3D Unregistered Shareware "VERSION
 
@@ -4950,7 +4950,7 @@ short spawn( short j, short pn )
                         sector[sect].ceilingz = sp->z;
                         break;
                     case 27:
-                        if(ud.recstat == 1)
+                        if(ud.recstat == 1 && !ud.disableCameras)
                         {
                             sp->xrepeat=sp->yrepeat=64;
                             sp->cstat &= 32767;
@@ -5430,8 +5430,9 @@ short spawn( short j, short pn )
     return i;
 }
 
-
-#ifdef _MSC_VER
+//pogokeen: new Visual C can optimize this fine
+#if 0
+//#ifdef _MSC_VER
 // Visual C thought this was a bit too hard to optimise so we'd better
 // tell it not to try... such a pussy it is.
 //#pragma auto_inline( off )
@@ -7269,6 +7270,7 @@ void comlinehelp(char **argv)
 		"/s#\t\tSkill (1-4)\n"
 		"/r\t\tRecord demo\n"
 		"/dFILE\t\tStart to play demo FILE\n"
+        "/k\t\tDisable demo cameras\n"
 		"/m\t\tNo monsters\n"
 		"/ns\t\tNo sound\n"
 		"/nm\t\tNo music\n"
@@ -7288,7 +7290,7 @@ void comlinehelp(char **argv)
 		"-name NAME\tFoward NAME\n"
 		"-net\t\tNet mode game\n"
 		"-nam\t\tActivates NAM compatibility mode (sets CON to NAM.CON and GRP to NAM.GRP)\n"
-		"-setup\t\ttDisplays the configuration dialogue box\n"
+		"-setup\t\tDisplays the configuration dialogue box\n"
 		;
 	wm_msgbox(apptitle,s);
 }
@@ -7348,6 +7350,7 @@ void checkcommandline(int argc,char **argv)
     i = 1;
 
     ud.fta_on = 1;
+    ud.disableCameras = 0;
     ud.god = 0;
     ud.m_respawn_items = 0;
     ud.m_respawn_monsters = 0;
@@ -7553,6 +7556,10 @@ void checkcommandline(int argc,char **argv)
 							}
 						}
                         break;
+                    case 'k':
+                    case 'K':
+                        ud.disableCameras = 1;
+                        break;
                     case 'l':
                     case 'L':
                         ud.warp_on = 1;
@@ -7599,13 +7606,11 @@ void checkcommandline(int argc,char **argv)
                         ud.m_respawn_inventory = ud.respawn_inventory = 1;
 
                         break;
-#if 0
                     case 'r':
                     case 'R':
                         ud.m_recstat = 1;
                         initprintf("Demo record mode on.\n");
                         break;
-#endif
                     case 't':
                     case 'T':
                         c++;
@@ -7770,7 +7775,7 @@ if (VOLUMEALL) {
     if(!KB_KeyWaiting() && nomorelogohack == 0)
     {
         getpackets();
-       // playanm("logo.anm",5);
+        //playanm("logo.anm",5);
         IFISSOFTMODE palto(0,0,0,63);
         KB_FlushKeyboardQueue();
 	KB_ClearKeysDown();	// JBF
@@ -8490,7 +8495,7 @@ if (!NAM && VOLUMEALL) {
         }
     }
 
-    if (show_video) {
+    if (show_video && !ud.warp_on) {
         play_vpx_video("video/3drLogo.ivf", NULL);
         play_vpx_video("video/nuke.ivf", play_nuke_sounds);
     }
@@ -8700,9 +8705,9 @@ char opendemoread(char which_demo) // 0 = mine
         return 0;
      }
 
-         if (kread(recfilep,(char *)&ud.volume_number,sizeof(char)) != sizeof(char)) goto corrupt;
-         if (kread(recfilep,(char *)&ud.level_number,sizeof(char)) != sizeof(char)) goto corrupt;
-         if (kread(recfilep,(char *)&ud.player_skill,sizeof(char)) != sizeof(char)) goto corrupt;
+     if (kread(recfilep,(char *)&ud.volume_number,sizeof(char)) != sizeof(char)) goto corrupt;
+     if (kread(recfilep,(char *)&ud.level_number,sizeof(char)) != sizeof(char)) goto corrupt;
+     if (kread(recfilep,(char *)&ud.player_skill,sizeof(char)) != sizeof(char)) goto corrupt;
      if (kread(recfilep,(char *)&ud.m_coop,sizeof(char)) != sizeof(char)) goto corrupt;
      if (kread(recfilep,(char *)&ud.m_ffire,sizeof(char)) != sizeof(char)) goto corrupt;
      if (kread(recfilep,(short *)&ud.multimode,sizeof(short)) != sizeof(short)) goto corrupt;
@@ -8837,6 +8842,13 @@ long playback(void)
 
     if(numplayers < 2) foundemo = opendemoread(which_demo);
 
+    //pogokeen: Ensure that the menu won't be hidden/reset while prepping a new demo
+    if (in_menu)
+    {
+        ps[myconnectindex].gm |= MODE_MENU;
+    }
+    ps[myconnectindex].gm |= MODE_DEMO;
+
     if(foundemo == 0)
     {
         if(which_demo > 1)
@@ -8845,7 +8857,7 @@ long playback(void)
             goto RECHECK;
         }
         fadepal(0,0,0, 0,63,7);
-	setgamepalette(&ps[myconnectindex], palette, 1);	// JBF 20040308
+        setgamepalette(&ps[myconnectindex], palette, 1);	// JBF 20040308
         drawbackground();
         menus();
         //ps[myconnectindex].palette = palette;
@@ -8910,6 +8922,10 @@ long playback(void)
             nonsharedkeys();
 
             j = min(max((totalclock-lockclock)*(65536/TICSPERFRAME),0),65536);
+            if (ud.disableCameras)
+            {
+                ud.camerasprite = -1;
+            }
             displayrooms(screenpeek,j);
             displayrest(j);
 

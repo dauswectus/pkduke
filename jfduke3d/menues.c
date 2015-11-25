@@ -5475,13 +5475,20 @@ void dnQuitGame() {
 extern int skip_next_motion;
 void dnHideMenu() {
     skip_next_motion = 1;
-	if (ps[myconnectindex].gm & MODE_GAME) {
-		ps[myconnectindex].gm &= ~MODE_MENU;
-        if(ud.multimode < 2 && ud.recstat != 2) {
-            ready2send = 1;
-            totalclock = ototalclock;
-        }
-	}
+
+	ps[myconnectindex].gm &= ~MODE_MENU;
+    if(ud.multimode < 2 && ud.recstat != 2) {
+        ready2send = 1;
+        totalclock = ototalclock;
+    }
+}
+
+int  dnNoModeSet() {
+    return ps[myconnectindex].gm == 0;
+}
+
+int  dnDemoModeSet() {
+    return ps[myconnectindex].gm & MODE_DEMO;
 }
 
 int  dnGameModeSet() {

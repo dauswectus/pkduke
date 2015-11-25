@@ -268,8 +268,8 @@ void intomenusounds(void)
         RPG_SHOOT,
         SELECT_WEAPON
     };
-    //sound(menusnds[menunum++]);
-    sound(INTO_MENU);
+    sound(menusnds[menunum++]);
+    //sound(INTO_MENU);
     menunum %= 17;
 }
 

@@ -37,6 +37,8 @@ private:
 
 	bool m_enabled_for_current_frame;
 	bool m_enabled;
+
+    bool m_justStarted;
 	
 	float m_menu_scale, m_menu_offset_x, m_menu_offset_y;
 	int m_mouse_x, m_mouse_y;
@@ -98,6 +100,8 @@ private:
     void ShowErrorMessage(const char *page_id, const char *message);
     
     void NewNetworkGame(lobby_info_t *lobby_info);
+
+    void InsertPKDuke3DCredits();
 	    
 public:
 	GUI(int width, int height);
