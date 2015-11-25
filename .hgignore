@@ -1,0 +1,14 @@
+syntax: glob
+Debug/
+Release/
+steamworks_sdk_130/
+thirdparty/bin-win32/
+duke3d/Debug_NOSTEAM/
+pkDuke3d.sdf
+pkDuke3d.v12.suo
+pkduke3d.suo
+duke3d.sdf
+duke3d/Release/
+duke3d/duke3d.vcxproj.user
+duke3d/Debug/
+Debug_NOSTEAM/
