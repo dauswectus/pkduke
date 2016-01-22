@@ -578,8 +578,8 @@ GUI::GUI(int width, int height):m_enabled(false),m_width(width),m_height(height)
 }
 
 void GUI::InsertPKDuke3DCredits() {
-    char pkDukeCreditsString[300];
-    sprintf(pkDukeCreditsString, "\n<h1>pkDuke3d</h1>\n<p>Alex <n>\"pogokeen\"</n> Dawson</p>\n<br /><p>Contributions (C) 2014, Alex Dawson</p>\n<p>pkDuke3d is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<\p>\n");
+    char pkDukeCreditsString[302];
+    sprintf(pkDukeCreditsString, "\n<h1>pkDuke3d</h1>\n<p>Alex <n>\"pogokeen\"</n> Dawson</p>\n<br /><p>Contributions (C) 2014-2015, Alex Dawson</p>\n<p>pkDuke3d is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<\p>\n");
     initprintf("Num docs: %d\n", m_context->GetNumDocuments());
     
     Rocket::Core::ElementDocument* creditsDoc = m_context->GetDocument("menu-credits");
@@ -1326,10 +1326,16 @@ void GUI::Render() {
     }
     
     CSTEAM_RunFrame();
-    Enable((dnMenuModeSet() && (dnDemoModeSet() || m_enabled_for_current_frame)) || m_justStarted);
+    Enable((dnMenuModeSet() && (dnDemoModeSet() || m_enabled_for_current_frame)) || m_justStarted || (dnDemoModeSet() && !dnGameModeSet() && ud.recstat == 0));
 	m_enabled_for_current_frame = false;
     m_justStarted = false;
-	if (m_enabled) {
+
+    if (dnDemoModeSet() && !dnMenuModeSet() && ud.recstat == 4)
+    {
+        m_menu->GetCurrentPage(m_context)->Hide();
+    }
+
+    if (m_enabled || (dnDemoModeSet() && !dnMenuModeSet() && ud.recstat == 4)) {
         GL_SetUIMode(m_width, m_height, m_menu_scale, m_menu_offset_x, m_menu_offset_y);
 
 		if (m_menu_offset_y != 0 && !dnGameModeSet()) {
@@ -1384,29 +1390,47 @@ void GUI::Enable(bool v) {
                 m_menu->ShowDocument(m_context, "menu-main", false);
                 JoinLobby( m_invited_lobby );
             } else {
-                m_menu->ShowDocument(m_context, m_show_press_enter ? "menu-start" : "menu-main", false);
+                m_menu->ShowDocument(m_context, "menu-start", false);
+                if (!m_show_press_enter)
+                {
+                    m_menu->DoItemAction(ItemActionEnter, m_menu->GetMenuItem(m_context->GetDocument("menu-start"), "start"));
+                }
                 
                 char message[1024];
                 dnGetQuitMessage(message);
-                Sys_DPrintf("Quit message: %s\n", message);
                 if (message[0] != 0) {
+                    Sys_DPrintf("Quit message: %s\n", message);
                     ShowErrorMessage("menu-main", message);
                 }
 
             }
-			if (dnGameModeSet()) {
+
+            if (dnGameModeSet() || ud.recstat == 2) {
 				m_context->GetDocument("menu-bg")->Hide();
-			} else {
-				//pogokeen: TODO: potentially show the background on a timer?
-				//Rocket::Core::ElementDocument *menubg = m_context->GetDocument("menu-bg");
-				//menubg->Show();
-			}
-                        
+            } else if (m_justStarted) {
+                m_menu->GetCurrentPage(m_context)->Hide();
+            }
+            
             ResetMouse();
 		} else {
-			m_context->ShowMouseCursor(false);
+            m_context->ShowMouseCursor(false);
 		}
 	}
+}
+
+void GUI::ShowBackground(char visible)
+{
+    if (visible != m_context->GetDocument("menu-bg")->IsVisible())
+    {
+        if (visible)
+        {
+            m_context->GetDocument("menu-bg")->Show();
+        }
+        else
+        {
+            m_context->GetDocument("menu-bg")->Hide();
+        }
+    }
 }
 
 void GUI::ResetMouse() {
@@ -1476,8 +1500,10 @@ bool GUI::InjectEvent(SDL_Event *ev) {
             m_waiting_for_key = false;
 		} else 	{
 			m_draw_strips = false;
-            
-			if (!m_menu->GoBack(m_context)) {
+            if ((!m_menu->GoBack(m_context) && !(dnDemoModeSet() && !dnGameModeSet() && ud.recstat == 0)) ||
+                (m_menu->GetCurrentPage(m_context)->GetId() == "menu-start" &&
+                 (dnDemoModeSet() && !dnGameModeSet() && (ud.recstat == 2 || ud.recstat == 4))))
+            {
                 menu_to_open = "menu-ingame";
 				dnHideMenu();
 			}

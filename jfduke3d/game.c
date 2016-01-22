@@ -56,7 +56,7 @@ Modifications for JonoF's port by Jonathon Fowler(jf@jonof.id.au)
 
 #include "_control.h"
 
-#define VERSION "pkDuke 1.3.2"
+#define VERSION "pkDuke 1.0"
 
 #define HEAD   "Duke Nukem 3D Unregistered Shareware "VERSION
 
@@ -190,6 +190,7 @@ void patchstatusbar(long x1, long y1, long x2, long y2)
 }
 
 int recfilep,totalreccnt;
+long recstartloc;
 char debug_on = 0,actor_tog = 0,*rtsptr,memorycheckoveride=0;
 
 
@@ -2339,7 +2340,7 @@ void gameexit(char *t) {
         ps[myconnectindex].palette = (char *) &palette[0];
     }
     
-    if (ud.recstat == 1) {
+    if (ud.recstat == 1 || ud.recstat == 3) {
         closedemowrite();
     } else if (ud.recstat == 2) {
         if (frecfilep) {
@@ -2599,6 +2600,19 @@ void displayrest(long smoothratio)
     minitext_y = minitext_y / (ydim/240.0);
     minitext_x -= (320 * n - 320)/2;
 
+    //POGO: track real time
+    unsigned long ticks = getticks();
+    char endingLevel = 0;
+    dnIterPlayers(i)
+    {
+        endingLevel |= ps[i].fist_incs;
+    }
+    if (!endingLevel && ((ps[myconnectindex].gm&MODE_DEMO) || !(ps[myconnectindex].gm&MODE_MENU)) && !ud.pause_on)
+    {
+        ud.realtime += ticks - ud.lastclock;
+        ud.realtotaltime += ticks - ud.lastclock;
+    }
+    ud.lastclock = ticks;
 
     pp = &ps[screenpeek];
 
@@ -2834,22 +2848,64 @@ void displayrest(long smoothratio)
                 if (j >= 12) minitext_y += 8;
             }
             
+            int slen = 0;
+            slen = sprintf(tempbuf, "Curr IL Qualifies As: %s",
+                           (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                            ps[myconnectindex].actors_killed == ud.maxKills) ? "Max%" :
+                           (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                            ps[myconnectindex].actors_killed == ps[myconnectindex].max_actors_killed) ? "100%" :
+                           (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) ? "100S" : "Any%");
+            //POGO: To right align, note that characters are 4 pixels wide, except spaces which are 5.
+            //      Additionally, the screen width is virtually 320.
+            minitext(320-minitext_x-4*slen-4, minitext_y+6+6+6+6+6, tempbuf, 0, 26);
 
-            
+            slen = sprintf(tempbuf,"Prev Qualify As: %s",
+                           (ud.speedrunCategoriesMet & 0x4) ? "Max%" :
+                           (ud.speedrunCategoriesMet & 0x2) ? "100%" :
+                           (ud.speedrunCategoriesMet & 0x1) ? "100S" : "Any%");
+            minitext(320-minitext_x-4*slen-3, minitext_y+6+6+6+6, tempbuf, 0, 26);
+
+            slen = sprintf(tempbuf, "Real Total Time: %lu:%02lu.%03lu",
+                           ud.realtotaltime/60000,
+                           (ud.realtotaltime%60000) / 1000,
+                           ud.realtotaltime%1000);
+            minitext(320-minitext_x-4*slen-3, minitext_y+6+6+6, tempbuf, 0, 26);
+
+            slen = sprintf(tempbuf, "Real Time: %lu:%02lu.%03lu",
+                           ud.realtime/60000,
+                           (ud.realtime%60000) / 1000,
+                           ud.realtime%1000);
+            minitext(320-minitext_x-4*slen-2, minitext_y+6+6, tempbuf, 0, 26);
+
+            slen = sprintf(tempbuf, "Total Time: %lu:%02lu",
+                           ((ud.totaltime + ps[myconnectindex].player_par) / (26 * 60)),
+                           ((ud.totaltime + ps[myconnectindex].player_par) / 26) % 60);
+            minitext(320-minitext_x-4*slen-2, minitext_y+6, tempbuf, 0, 26);
+
+            slen = sprintf(tempbuf, "Lvl Time: %ld:%02ld",
+                           (ps[myconnectindex].player_par / (26 * 60)),
+                           (ps[myconnectindex].player_par / 26) % 60);
+            minitext(320-minitext_x-4*slen-2, minitext_y, tempbuf, 0, 26);
+
+
             sprintf(tempbuf, "FPS: %d", dnFPS);
             minitext(minitext_x,minitext_y+6+6+6,tempbuf,0,26);
             
-            sprintf(tempbuf,"Time: %ld:%02ld",
-                    (ps[myconnectindex].player_par/(26*60)),
-                    (ps[myconnectindex].player_par/26)%60);
-            minitext(minitext_x,minitext_y+6+6,tempbuf,0,26);
+            sprintf(tempbuf, "Rec: %s", ud.recstat == 1 ? "IL" : ud.recstat == 3 ? "CN" : "OFF");
+            minitext(minitext_x, minitext_y+6+6, tempbuf, 0, 26);
             
             if(ud.player_skill > 3 )
+            {
                 sprintf(tempbuf,"Kills: %ld",ps[myconnectindex].actors_killed);
-            else
-                sprintf(tempbuf,"Kills: %ld/%ld",ps[myconnectindex].actors_killed,
+            } else
+            {
+                /*sprintf(tempbuf,"Kills: %ld/%ld (Max%% Kills: %lu)",ps[myconnectindex].actors_killed,
                         ps[myconnectindex].max_actors_killed>ps[myconnectindex].actors_killed?
-                        ps[myconnectindex].max_actors_killed:ps[myconnectindex].actors_killed);
+                        ps[myconnectindex].max_actors_killed:ps[myconnectindex].actors_killed,
+                        ud.maxKills);*/
+                sprintf(tempbuf,"Kills: %ld/%ld (Max: %lu)",
+                        ps[myconnectindex].actors_killed, ps[myconnectindex].max_actors_killed, ud.maxKills);
+            }
             minitext(minitext_x,minitext_y+6,tempbuf,0,26);
             
             sprintf(tempbuf,"Secrets: %ld/%ld", ps[myconnectindex].secret_rooms,ps[myconnectindex].max_secret_rooms);
@@ -2995,6 +3051,8 @@ void drawbackground(void)
 		for(y=y1;y<y2;y+=tilesizy[dapicnum])
 			for(x=0;x<xdim;x+=tilesizx[dapicnum])
 				rotatesprite(x<<16,y<<16,65536L,0,dapicnum,8,0,8+16+64+128,0,0,xdim-1,ydim-1);
+#else
+        GUI_ShowBackground(true);
 #endif
 		return;
 	}
@@ -3625,6 +3683,7 @@ long tempwallptr;
 short spawn( short j, short pn )
 {
     short i, s, startwall, endwall, sect, clostest=0;
+    short src = j;
     long x, y, d;
     spritetype *sp;
 
@@ -3739,7 +3798,9 @@ short spawn( short j, short pn )
                         if( actortype[sp->picnum] & 2)
                             hittype[i].actorstayput = sp->sectnum;
 
-                        ps[myconnectindex].max_actors_killed++;
+                        //POGO: I do this myself elsewhere to fix the 100% kill tally
+                        //ps[myconnectindex].max_actors_killed++;
+
                         sp->clipdist = 80;
                         if(j >= 0)
                         {
@@ -4634,8 +4695,9 @@ short spawn( short j, short pn )
                     {
                         sp->cstat |= 257;
 
-                        if(sp->picnum != SHARK)
-                            ps[myconnectindex].max_actors_killed++;
+                        //POGO: I do this myself elsewhere to fix the 100% kill tally
+                        /*if(sp->picnum != SHARK)
+                            ps[myconnectindex].max_actors_killed++;*/
                     }
 
                     if(sp->picnum == ORGANTIC) sp->cstat |= 128;
@@ -4714,7 +4776,8 @@ short spawn( short j, short pn )
                         changespritestat(i,5);
                         return i;
                     }
-                    ps[myconnectindex].max_actors_killed++;
+                    //POGO: I do this myself elsewhere to fix the 100% kill tally
+                    //ps[myconnectindex].max_actors_killed++;
                     hittype[i].temp_data[5] = 0;
                     if(ud.monsters_off == 1)
                     {
@@ -4950,7 +5013,7 @@ short spawn( short j, short pn )
                         sector[sect].ceilingz = sp->z;
                         break;
                     case 27:
-                        if(ud.recstat == 1 && !ud.disableCameras)
+                        if((ud.recstat == 1 || ud.recstat == 3) && !ud.disableCameras)
                         {
                             sp->xrepeat=sp->yrepeat=64;
                             sp->cstat &= 32767;
@@ -5427,6 +5490,38 @@ short spawn( short j, short pn )
                 changespritestat(i,6);
                 break;
     }
+
+    if ((sp->picnum == EGG || src != -1 || sp->lotag <= ud.player_skill) &&
+        sprite[i].statnum < MAXSTATUS)
+    {
+        for (short* pSpawnablePN = SPAWNABLE_ENEMY_PIC_NUMS; pSpawnablePN < SPAWNABLE_ENEMY_PIC_NUMS+sizeof(SPAWNABLE_ENEMY_PIC_NUMS)/sizeof(SPAWNABLE_ENEMY_PIC_NUMS[0]); ++pSpawnablePN)
+        {
+            if (sp->picnum == *pSpawnablePN)
+            {
+                if (src < 0 || (sprite[src].picnum != RESPAWN &&
+                                sprite[src].picnum != CANWITHSOMETHING &&
+                                sprite[src].picnum != CANWITHSOMETHING2 &&
+                                sprite[src].picnum != CANWITHSOMETHING3 &&
+                                sprite[src].picnum != CANWITHSOMETHING4 &&
+                                sprite[src].picnum != MONK &&
+                                sprite[src].picnum != LUKE &&
+                                sprite[src].picnum != INDY &&
+                                sprite[src].picnum != JURYGUY))
+                {
+                    ud.maxKills++;
+                }
+                if ((sp->picnum != EGG && sp->picnum != RECON) ||
+                    src < 0 ||
+                    sprite[src].picnum != RESPAWN)
+                {
+                    //POGO: fix the 100% kill tally
+                    ps[myconnectindex].max_actors_killed++;
+                }
+                //OSD_Printf("Found Enemy: %hu (Index: %hu)\n", sp->picnum, i);
+            }
+        }
+    }
+
     return i;
 }
 
@@ -5539,7 +5634,7 @@ void animatesprites(long x,long y,short a,long smoothratio)
         switch(s->picnum)
         {
             case SECTOREFFECTOR:
-                if(t->lotag == 27 && ud.recstat == 1)
+                if(t->lotag == 27 && (ud.recstat == 1 || ud.recstat == 3))
                 {
                     t->picnum = 11+((totalclock>>3)&1);
                     t->cstat |= 128;
@@ -7268,7 +7363,8 @@ void comlinehelp(char **argv)
 		"/l##\t\tLevel (1-11)\n"
 		"/v#\t\tVolume (1-4)\n"
 		"/s#\t\tSkill (1-4)\n"
-		"/r\t\tRecord demo\n"
+		"/r\t\tRecord Individual Level Demo\n"
+        "/rc\t\tRecord Continuous Demo\n"
 		"/dFILE\t\tStart to play demo FILE\n"
         "/k\t\tDisable demo cameras\n"
 		"/m\t\tNo monsters\n"
@@ -7291,6 +7387,9 @@ void comlinehelp(char **argv)
 		"-net\t\tNet mode game\n"
 		"-nam\t\tActivates NAM compatibility mode (sets CON to NAM.CON and GRP to NAM.GRP)\n"
 		"-setup\t\tDisplays the configuration dialogue box\n"
+        "-addon #\t\tSet which add-on to play (0 = Atomic [Default], 1 = D.C., 2 = Nuclear Winter, 3 = Caribbean)\n"
+        "-noanim\t\tDisable animations\n"
+        "-delete-saves\t\tDelete all saves from cloud and locally\n"
 		;
 	wm_msgbox(apptitle,s);
 }
@@ -7351,6 +7450,17 @@ void checkcommandline(int argc,char **argv)
 
     ud.fta_on = 1;
     ud.disableCameras = 0;
+    ud.demoPlayerMode = 0;
+    ud.demoStartFromScratch = 0;
+    ud.totaltime = 0;
+    ud.realtime = 0;
+    ud.realtotaltime = 0;
+    ud.totaltimestore = 0;
+    ud.realtotaltimestore = 0;
+    ud.lastclock = getticks();
+    ud.maxKills = 0;
+    ud.speedrunCategoriesMet = 0xFF;
+    ud.startedepisode = 0xF;
     ud.god = 0;
     ud.m_respawn_items = 0;
     ud.m_respawn_monsters = 0;
@@ -7489,6 +7599,9 @@ void checkcommandline(int argc,char **argv)
                             strcat(c,".dmo");
                         initprintf("Play demo %s.\n",c);
                         strcpy(firstdemofile,c);
+                        ud.demoPlayerMode = 1;
+                        //Disable cutscenes for demo playback mode
+                        noanim = 1;
                         break;
                     case 'f':
                     case 'F':
@@ -7608,8 +7721,16 @@ void checkcommandline(int argc,char **argv)
                         break;
                     case 'r':
                     case 'R':
-                        ud.m_recstat = 1;
-                        initprintf("Demo record mode on.\n");
+                        if (*(c+1) == 'c' || *(c+1) == 'C')
+                        {
+                            c++;
+                            ud.m_recstat = 3;
+                            initprintf("Continuous demo record mode on.\n");
+                        } else
+                        {
+                            ud.m_recstat = 1;
+                            initprintf("Individual level demo record mode on.\n");
+                        }
                         break;
                     case 't':
                     case 'T':
@@ -7766,7 +7887,6 @@ void Logo(void)
     flushperms();
     nextpage();
 
-    stopmusic();
     FX_StopAllSounds();	// JBF 20031228
     clearsoundlocks();	// JBF 20031228
 
@@ -7776,16 +7896,15 @@ if (VOLUMEALL) {
     {
         getpackets();
         //playanm("logo.anm",5);
+        playmusic(&env_music_fn[0][0]);
         IFISSOFTMODE palto(0,0,0,63);
         KB_FlushKeyboardQueue();
-	KB_ClearKeysDown();	// JBF
+	    KB_ClearKeysDown();	// JBF
     }
 
     clearview(0L);
     nextpage();
 }
-
-    playmusic(&env_music_fn[0][0]);
 
 	goto stop;
 
@@ -8495,7 +8614,7 @@ if (!NAM && VOLUMEALL) {
         }
     }
 
-    if (show_video && !ud.warp_on) {
+    if (show_video && !ud.warp_on && !noanim) {
         play_vpx_video("video/3drLogo.ivf", NULL);
         play_vpx_video("video/nuke.ivf", play_nuke_sounds);
     }
@@ -8573,15 +8692,24 @@ if (VOLUMEONE) {
 
 	    OSD_DispatchQueued();
 	    
-        if( ud.recstat == 2 || ud.multimode > 1 || ( ud.show_help == 0 && (ps[myconnectindex].gm&MODE_MENU) != MODE_MENU ) )
-            if( ps[myconnectindex].gm&MODE_GAME )
-                if( moveloop() ) continue;
+        if (ud.recstat == 2 || ud.multimode > 1 || (ud.show_help == 0 && (ps[myconnectindex].gm&MODE_MENU) != MODE_MENU))
+        {
+            if (ps[myconnectindex].gm&MODE_GAME)
+            {
+                if (moveloop()) continue;
+            }
+        }
 
         if( ps[myconnectindex].gm&MODE_EOL || ps[myconnectindex].gm&MODE_RESTART )
         {
             if( ps[myconnectindex].gm&MODE_EOL )
             {
-                closedemowrite();
+                //POGOTODO: ensure that doing this here isn't going to allow for corrupt IL demos when jumping directly to a level from a recording
+                //POGO: if we are recording a continous demo, then we will write the start of the next level when it begins
+                if (ud.recstat == 1)
+                {
+                    closedemowrite();
+                }
 
                 ready2send = 0;
 
@@ -8678,6 +8806,8 @@ char opendemoread(char which_demo) // 0 = mine
 
     strcpy(d, "demo_.dmo");
 
+    //POGOTODO: playing a demo after playing a different demo once lead to the randomseeds being wrong... but I haven't had it again
+
     if(which_demo == 10)
         d[4] = 'x';
     else
@@ -8694,6 +8824,7 @@ char opendemoread(char which_demo) // 0 = mine
 
      if (kread(recfilep,&ud.reccnt,sizeof(long)) != sizeof(long)) goto corrupt;
      if (kread(recfilep,&ver,sizeof(char)) != sizeof(char)) goto corrupt;
+     //POGOTODO: ensure this also takes into account add-ons (& maybe even mods)!
      if( (ver != BYTEVERSION) ) // || (ud.reccnt < 512) )
      {
         if      (ver == BYTEVERSION_JF)   initprintf("Demo %s is for Regular edition.\n", d);
@@ -8735,8 +8866,14 @@ char opendemoread(char which_demo) // 0 = mine
      ud.clipping = ud.scrollmode = ud.overhead_on = 0;
      ud.showweapons =  ud.pause_on = ud.auto_run = 0;
 
-         newgame(ud.volume_number,ud.level_number,ud.player_skill);
-         return(1);
+     ud.totaltime = 0;
+     ud.realtime = 0;
+     ud.realtotaltime = 0;
+
+     opendemoverificationread();
+
+     newgame(ud.volume_number,ud.level_number,ud.player_skill);
+     return(1);
 corrupt:
      OSD_Printf("Demo file %d is corrupt.\n",which_demo);
      ud.reccnt = 0;
@@ -8744,9 +8881,9 @@ corrupt:
      return 0;
 }
 
-
 void opendemowrite(void)
 {
+    //POGOTODO: overload this method so that it can accept a custom filename
     char *d = "demo1.dmo";
     long dummylong = 0;
     char ver;
@@ -8757,6 +8894,7 @@ void opendemowrite(void)
     ver = BYTEVERSION;
 
     if ((frecfilep = fopen(d,"wb")) == NULL) return;
+    recstartloc = 0;
     fwrite(&dummylong,4,1,frecfilep);
     fwrite(&ver,sizeof(char),1,frecfilep);
     fwrite((char *)&ud.volume_number,sizeof(char),1,frecfilep);
@@ -8782,44 +8920,690 @@ void opendemowrite(void)
 
     totalreccnt = 0;
     ud.reccnt = 0;
+    ud.demoStartFromScratch = 0;
+
+    opendemoverificationwrite();
 }
 
 void record(void)
 {
     short i;
 
+    recorddemoverification();
+
     dnIterPlayers(i)
-         {
-         copybufbyte(&sync[i],&recsync[ud.reccnt],sizeof(input));
-                 ud.reccnt++;
-                 totalreccnt++;
-                 if (ud.reccnt >= RECSYNCBUFSIZ)
-                 {
-              dfwrite(recsync,sizeof(input)*ud.multimode,ud.reccnt/ud.multimode,frecfilep);
-                          ud.reccnt = 0;
-                 }
-         }
+    {
+        copybufbyte(&sync[i],&recsync[ud.reccnt],sizeof(input));
+        ud.reccnt++;
+        totalreccnt++;
+        if (ud.reccnt >= RECSYNCBUFSIZ)
+        {
+            dfwrite(recsync,sizeof(input)*ud.multimode,ud.reccnt/ud.multimode,frecfilep);
+            ud.reccnt = 0;
+        }
+    }
+}
+
+char demoreadnewboard(void)
+{
+    if (kread(recfilep, &ud.reccnt, sizeof(long)) != sizeof(long)) goto corrupt;
+    if (kread(recfilep, &ud.demoStartFromScratch, sizeof(char)) != sizeof(char)) goto corrupt;
+    if (kread(recfilep, (char *)&ud.volume_number, sizeof(char)) != sizeof(char)) goto corrupt;
+    if (kread(recfilep, (char *)&ud.level_number, sizeof(char)) != sizeof(char)) goto corrupt;
+    if (kread(recfilep, (char *)&ud.player_skill, sizeof(char)) != sizeof(char)) goto corrupt;
+    if (kread(recfilep, (char *)&ud.m_coop, sizeof(char)) != sizeof(char)) goto corrupt;
+    if (kread(recfilep, (char *)&ud.m_ffire, sizeof(char)) != sizeof(char)) goto corrupt;
+    if (kread(recfilep, (short *)&ud.multimode, sizeof(short)) != sizeof(short)) goto corrupt;
+    if (kread(recfilep, (short *)&ud.m_monsters_off, sizeof(short)) != sizeof(short)) goto corrupt;
+    if (kread(recfilep, (int32 *)&ud.m_respawn_monsters, sizeof(int32)) != sizeof(int32)) goto corrupt;
+    if (kread(recfilep, (int32 *)&ud.m_respawn_items, sizeof(int32)) != sizeof(int32)) goto corrupt;
+    if (kread(recfilep, (int32 *)&ud.m_respawn_inventory, sizeof(int32)) != sizeof(int32)) goto corrupt;
+    if (kread(recfilep, (int32 *)&ud.playerai, sizeof(int32)) != sizeof(int32)) goto corrupt;
+    if (kread(recfilep, (char *)&ud.user_name[0][0], sizeof(ud.user_name)) != sizeof(ud.user_name)) goto corrupt;
+    if (kread(recfilep, (int32 *)&ud.auto_run, sizeof(int32)) != sizeof(int32)) goto corrupt;
+    if (kread(recfilep, (char *)boardfilename, sizeof(boardfilename)) != sizeof(boardfilename)) goto corrupt;
+    if (boardfilename[0] != 0)
+    {
+        ud.m_level_number = 7;
+        ud.m_volume_number = 0;
+    }
+
+    for (int i = 0; i<ud.multimode; i++) {
+        if (kread(recfilep, (int32 *)&ps[i].aim_mode, sizeof(int32)) != sizeof(int32)) goto corrupt;
+        if (kread(recfilep, (int32 *)&ps[i].auto_aim, sizeof(int32)) != sizeof(int32)) goto corrupt;	// JBF 20031126
+        if (kread(recfilep, (int32 *)&ps[i].weaponswitch, sizeof(int32)) != sizeof(int32)) goto corrupt;
+    }
+
+    ud.god = ud.cashman = ud.eog = ud.showallmap = 0;
+    ud.clipping = ud.scrollmode = ud.overhead_on = 0;
+    ud.showweapons = ud.pause_on = ud.auto_run = 0;
+
+    if (ud.demoStartFromScratch)
+    {
+        newgame(ud.volume_number, ud.level_number, ud.player_skill);
+        ud.demoStartFromScratch = 0;
+    }
+    return(1);
+corrupt:
+    ud.reccnt = 0;
+    kclose(recfilep);
+    closedemoverification();
+    return 0;
+}
+
+void demowritenewboard(void)
+{
+    if (ud.recstat == 3)
+    {
+        if (ud.reccnt > 0)
+        {
+            dfwrite(recsync, sizeof(input)*ud.multimode, ud.reccnt / ud.multimode, frecfilep);
+            long rsl = ftell(frecfilep);
+            fseek(frecfilep, recstartloc, SEEK_SET);
+            recstartloc = rsl;
+            fwrite(&totalreccnt, sizeof(long), 1, frecfilep);
+            fseek(frecfilep, recstartloc, SEEK_SET);
+
+            long dummylong = 0;
+
+            //setup recording the next level
+            fwrite(&dummylong, 4, 1, frecfilep);
+            fwrite((char *)&ud.demoStartFromScratch, sizeof(char), 1, frecfilep);
+            ud.demoStartFromScratch = 0;
+            fwrite((char *)&ud.volume_number, sizeof(char), 1, frecfilep);
+            fwrite((char *)&ud.level_number, sizeof(char), 1, frecfilep);
+            fwrite((char *)&ud.player_skill, sizeof(char), 1, frecfilep);
+            fwrite((char *)&ud.m_coop, sizeof(char), 1, frecfilep);
+            fwrite((char *)&ud.m_ffire, sizeof(char), 1, frecfilep);
+            fwrite((short *)&ud.multimode, sizeof(short), 1, frecfilep);
+            fwrite((short *)&ud.m_monsters_off, sizeof(short), 1, frecfilep);
+            fwrite((int32 *)&ud.m_respawn_monsters, sizeof(int32), 1, frecfilep);
+            fwrite((int32 *)&ud.m_respawn_items, sizeof(int32), 1, frecfilep);
+            fwrite((int32 *)&ud.m_respawn_inventory, sizeof(int32), 1, frecfilep);
+            fwrite((int32 *)&ud.playerai, sizeof(int32), 1, frecfilep);
+            fwrite((char *)&ud.user_name[0][0], sizeof(ud.user_name), 1, frecfilep);
+            fwrite((int32 *)&ud.auto_run, sizeof(int32), 1, frecfilep);
+            fwrite((char *)boardfilename, sizeof(boardfilename), 1, frecfilep);
+
+            for (int32 i = 0; i<ud.multimode; i++) {
+                fwrite((int32 *)&ps[i].aim_mode, sizeof(int32), 1, frecfilep);
+                fwrite((int32 *)&ps[i].auto_aim, sizeof(int32), 1, frecfilep);		// JBF 20031126
+                fwrite(&ps[i].weaponswitch, sizeof(int32), 1, frecfilep);
+            }
+
+            totalreccnt = 0;
+            ud.reccnt = 0;
+        }
+    }
 }
 
 void closedemowrite(void)
 {
-    if (ud.recstat == 1)
+    if (ud.recstat == 1 || ud.recstat == 3)
     {
         if (ud.reccnt > 0)
         {
             dfwrite(recsync,sizeof(input)*ud.multimode,ud.reccnt/ud.multimode,frecfilep);
 
-            fseek(frecfilep,SEEK_SET,0L);
+            fseek(frecfilep, recstartloc, SEEK_SET);
             fwrite(&totalreccnt,sizeof(long),1,frecfilep);
             ud.recstat = ud.m_recstat = 0;
+
+            totalreccnt = 0;
+            ud.reccnt = 0;
         }
         fclose(frecfilep);
+
+        closedemoverification();
     }
 }
 
-char which_demo = 1;
-char in_menu = 0;
+#ifdef _DEBUG
+FILE* demoverificationfilep = 0;
+#endif
+void opendemoverificationwrite(void)
+{
+#ifdef _DEBUG
+    char *dv = "demo1.dv";
+    demoverificationfilep = fopen(dv, "wb");
+#endif
+}
 
+void opendemoverificationread(void)
+{
+#ifdef _DEBUG
+    char *dv = "demo1.dv";
+    demoverificationfilep = fopen(dv, "rb");
+#endif
+}
+
+void closedemoverification(void)
+{
+    if (demoverificationfilep != 0)
+    {
+        fclose(demoverificationfilep);
+        demoverificationfilep = 0;
+    }
+}
+
+//POGOTODO: clean-up these demo verification functions
+void recorddemoverification(void)
+{
+#ifdef _DEBUG
+    if (demoverificationfilep == 0)
+    {
+        return;
+    }
+    
+    unsigned long crcv;
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)wall, sizeof(wall));
+    crc32finish(&crcv);
+    fwrite(&crcv, sizeof(unsigned long), 1, demoverificationfilep);
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)sector, sizeof(sector));
+    crc32finish(&crcv);
+    fwrite(&crcv, sizeof(unsigned long), 1, demoverificationfilep);
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)sprite, sizeof(sprite));
+    crc32finish(&crcv);
+    fwrite(&crcv, sizeof(unsigned long), 1, demoverificationfilep);
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)spriteext, sizeof(spriteext));
+    crc32finish(&crcv);
+    fwrite(&crcv, sizeof(unsigned long), 1, demoverificationfilep);
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)msx, sizeof(msx));
+    crc32finish(&crcv);
+    fwrite(&crcv, sizeof(unsigned long), 1, demoverificationfilep);
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)msy, sizeof(msy));
+    crc32finish(&crcv);
+    fwrite(&crcv, sizeof(unsigned long), 1, demoverificationfilep);
+
+    fwrite(&ps, sizeof(ps), 1, demoverificationfilep);
+
+    fwrite(&randomseed, sizeof(randomseed), 1, demoverificationfilep);
+    fwrite(&global_random, sizeof(global_random), 1, demoverificationfilep);
+
+    /* else if (ud.reccnt % 100 != 0)
+    {
+        return;
+    }
+
+    long i, j;
+    char scriptptrs[MAXSCRIPTSIZE];
+
+    fwrite(&numwalls, 2, 1, demoverificationfilep);
+    fwrite(&wall[0], sizeof(walltype), MAXWALLS, demoverificationfilep);
+    fwrite(&numsectors, 2, 1, demoverificationfilep);
+    fwrite(&sector[0], sizeof(sectortype), MAXSECTORS, demoverificationfilep);
+    fwrite(&sprite[0], sizeof(spritetype), MAXSPRITES, demoverificationfilep);
+    fwrite(&spriteext[0], sizeof(spriteexttype), MAXSPRITES, demoverificationfilep);
+    fwrite(&headspritesect[0], 2, MAXSECTORS + 1, demoverificationfilep);
+    fwrite(&prevspritesect[0], 2, MAXSPRITES, demoverificationfilep);
+    fwrite(&nextspritesect[0], 2, MAXSPRITES, demoverificationfilep);
+    fwrite(&headspritestat[0], 2, MAXSTATUS + 1, demoverificationfilep);
+    fwrite(&prevspritestat[0], 2, MAXSPRITES, demoverificationfilep);
+    fwrite(&nextspritestat[0], 2, MAXSPRITES, demoverificationfilep);
+    fwrite(&numcyclers, sizeof(numcyclers), 1, demoverificationfilep);
+    fwrite(&cyclers[0][0], 12, MAXCYCLERS, demoverificationfilep);
+    fwrite(ps, sizeof(ps), 1, demoverificationfilep);
+    fwrite(po, sizeof(po), 1, demoverificationfilep);
+    fwrite(&numanimwalls, sizeof(numanimwalls), 1, demoverificationfilep);
+    fwrite(&animwall, sizeof(animwall), 1, demoverificationfilep);
+    fwrite(&msx[0], sizeof(long), sizeof(msx) / sizeof(long), demoverificationfilep);
+    fwrite(&msy[0], sizeof(long), sizeof(msy) / sizeof(long), demoverificationfilep);
+    fwrite(&spriteqloc, sizeof(short), 1, demoverificationfilep);
+    fwrite(&spriteqamount, sizeof(short), 1, demoverificationfilep);
+    fwrite(&spriteq[0], sizeof(short), spriteqamount, demoverificationfilep);
+    fwrite(&mirrorcnt, sizeof(short), 1, demoverificationfilep);
+    fwrite(&mirrorwall[0], sizeof(short), 64, demoverificationfilep);
+    fwrite(&mirrorsector[0], sizeof(short), 64, demoverificationfilep);
+    fwrite(&show2dsector[0], sizeof(char), MAXSECTORS >> 3, demoverificationfilep);
+    fwrite(&actortype[0], sizeof(char), MAXTILES - VIRTUALTILES, demoverificationfilep);
+
+    fwrite(&numclouds, sizeof(numclouds), 1, demoverificationfilep);
+    fwrite(&clouds[0], sizeof(short) << 7, 1, demoverificationfilep);
+    fwrite(&cloudx[0], sizeof(short) << 7, 1, demoverificationfilep);
+    fwrite(&cloudy[0], sizeof(short) << 7, 1, demoverificationfilep);
+
+    for (i = 0; i<MAXSCRIPTSIZE; i++)
+    {
+        if ((long)script[i] >= (long)(&script[0]) && (long)script[i] < (long)(&script[MAXSCRIPTSIZE]))
+        {
+            scriptptrs[i] = 1;
+            j = (long)script[i] - (long)&script[0];
+            script[i] = j;
+        }
+        else scriptptrs[i] = 0;
+    }
+
+    fwrite(&scriptptrs[0], 1, MAXSCRIPTSIZE, demoverificationfilep);
+    fwrite(&script[0], 4, MAXSCRIPTSIZE, demoverificationfilep);
+
+    for (i = 0; i<MAXSCRIPTSIZE; i++)
+        if (scriptptrs[i])
+        {
+        j = script[i] + (long)&script[0];
+        script[i] = j;
+        }
+
+    for (i = 0; i<MAXTILES - VIRTUALTILES; i++)
+        if (actorscrptr[i])
+        {
+        j = (long)actorscrptr[i] - (long)&script[0];
+        actorscrptr[i] = (long *)j;
+        }
+    fwrite(&actorscrptr[0], 4, MAXTILES - VIRTUALTILES, demoverificationfilep);
+    for (i = 0; i<MAXTILES - VIRTUALTILES; i++)
+        if (actorscrptr[i])
+        {
+        j = (long)actorscrptr[i] + (long)&script[0];
+        actorscrptr[i] = (long *)j;
+        }
+
+    for (i = 0; i<MAXSPRITES; i++)
+    {
+        scriptptrs[i] = 0;
+
+        if (actorscrptr[PN] == 0) continue;
+
+        j = (long)&script[0];
+
+        if (T2 >= j && T2 < (long)(&script[MAXSCRIPTSIZE]))
+        {
+            scriptptrs[i] |= 1;
+            T2 -= j;
+        }
+        if (T5 >= j && T5 < (long)(&script[MAXSCRIPTSIZE]))
+        {
+            scriptptrs[i] |= 2;
+            T5 -= j;
+        }
+        if (T6 >= j && T6 < (long)(&script[MAXSCRIPTSIZE]))
+        {
+            scriptptrs[i] |= 4;
+            T6 -= j;
+        }
+    }
+
+    fwrite(&scriptptrs[0], 1, MAXSPRITES, demoverificationfilep);
+    fwrite(&hittype[0], sizeof(struct weaponhit), MAXSPRITES, demoverificationfilep);
+
+    for (i = 0; i<MAXSPRITES; i++)
+    {
+        if (actorscrptr[PN] == 0) continue;
+        j = (long)&script[0];
+
+        if (scriptptrs[i] & 1)
+            T2 += j;
+        if (scriptptrs[i] & 2)
+            T5 += j;
+        if (scriptptrs[i] & 4)
+            T6 += j;
+    }
+
+    fwrite(&lockclock, sizeof(lockclock), 1, demoverificationfilep);
+    fwrite(&pskybits, sizeof(pskybits), 1, demoverificationfilep);
+    fwrite(&pskyoff[0], sizeof(pskyoff[0]), MAXPSKYTILES, demoverificationfilep);
+    fwrite(&animatecnt, sizeof(animatecnt), 1, demoverificationfilep);
+    fwrite(&animatesect[0], 2, MAXANIMATES, demoverificationfilep);
+    for (i = animatecnt - 1; i >= 0; i--) animateptr[i] = (long *)((long)animateptr[i] - (long)(&sector[0]));
+    fwrite(&animateptr[0], 4, MAXANIMATES, demoverificationfilep);
+    for (i = animatecnt - 1; i >= 0; i--) animateptr[i] = (long *)((long)animateptr[i] + (long)(&sector[0]));
+    fwrite(&animategoal[0], 4, MAXANIMATES, demoverificationfilep);
+    fwrite(&animatevel[0], 4, MAXANIMATES, demoverificationfilep);
+
+    fwrite(&earthquaketime, sizeof(earthquaketime), 1, demoverificationfilep);
+    fwrite(&ud.from_bonus, sizeof(ud.from_bonus), 1, demoverificationfilep);
+    fwrite(&ud.secretlevel, sizeof(ud.secretlevel), 1, demoverificationfilep);
+    fwrite(&ud.god, sizeof(ud.god), 1, demoverificationfilep);
+    fwrite(&ud.auto_run, sizeof(ud.auto_run), 1, demoverificationfilep);
+    fwrite(&ud.last_level, sizeof(ud.last_level), 1, demoverificationfilep);
+    fwrite(&ud.eog, sizeof(ud.eog), 1, demoverificationfilep);
+    fwrite(&camsprite, sizeof(camsprite), 1, demoverificationfilep);
+    fwrite(&connecthead, sizeof(connecthead), 1, demoverificationfilep);
+    fwrite(connectpoint2, sizeof(connectpoint2), 1, demoverificationfilep);
+    fwrite(&numplayersprites, sizeof(numplayersprites), 1, demoverificationfilep);
+    fwrite((short *)&frags[0][0], sizeof(frags), 1, demoverificationfilep);
+
+    fwrite(&randomseed, sizeof(randomseed), 1, demoverificationfilep);
+    fwrite(&global_random, sizeof(global_random), 1, demoverificationfilep);
+    fwrite(&parallaxyscale, sizeof(parallaxyscale), 1, demoverificationfilep);*/
+#endif
+}
+
+#ifdef _DEBUG
+/*short dv_numsectors, dv_numwalls;
+sectortype dv_sector[MAXSECTORS];
+walltype dv_wall[MAXWALLS];
+spritetype dv_sprite[MAXSPRITES];
+spriteexttype dv_spriteext[MAXSPRITES + MAXUNIQHUDID];
+short dv_headspritesect[MAXSECTORS + 1], dv_headspritestat[MAXSTATUS + 1];
+short dv_prevspritesect[MAXSPRITES], dv_prevspritestat[MAXSPRITES];
+short dv_nextspritesect[MAXSPRITES], dv_nextspritestat[MAXSPRITES];
+short dv_cyclers[MAXCYCLERS][6], dv_numcyclers;
+struct player_orig dv_po[MAXPLAYERS];
+short dv_numanimwalls;
+struct animwalltype dv_animwall[MAXANIMWALLS];
+long dv_msx[2048], dv_msy[2048];
+short dv_spriteq[1024], dv_spriteqloc, dv_spriteqamount = 64;
+short dv_mirrorwall[64], dv_mirrorsector[64], dv_mirrorcnt;
+char dv_show2dsector[(MAXSECTORS + 7) >> 3];
+char dv_actortype[MAXTILES];
+short dv_numclouds, dv_clouds[128], dv_cloudx[128], dv_cloudy[128];
+long dv_script[MAXSCRIPTSIZE + 16];
+long *dv_actorscrptr[MAXTILES];
+struct weaponhit dv_hittype[MAXSPRITES];
+long dv_lockclock;
+short dv_pskyoff[MAXPSKYTILES], dv_pskybits;
+short dv_animatesect[MAXANIMATES];
+long *dv_animateptr[MAXANIMATES], dv_animategoal[MAXANIMATES], dv_animatevel[MAXANIMATES], dv_animatecnt;
+char dv_numplayersprites, dv_earthquaketime;
+short dv_ud_from_bonus;
+short dv_ud_last_level, dv_ud_secretlevel;
+char dv_ud_god;
+int32 dv_ud_auto_run;
+char dv_ud_eog;
+short dv_camsprite;
+long dv_connecthead, dv_connectpoint2[MAXPLAYERS];
+short dv_frags[MAXPLAYERS][MAXPLAYERS];*/
+struct player_struct dv_ps[MAXPLAYERS];
+long dv_randomseed;
+short int dv_global_random;
+//long dv_parallaxyscale;
+#endif
+
+void verifydemoframe(void)
+{
+    if (demoverificationfilep == 0)
+    {
+        return;
+    }
+
+    OSD_Printf("reccnt: %lu\n", ud.reccnt);
+
+    unsigned long crcv;
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)wall, sizeof(wall));
+    crc32finish(&crcv);
+
+    unsigned long crcdv;
+    fread(&crcdv, sizeof(unsigned long), 1, demoverificationfilep);
+    if (crcdv != crcv)
+    {
+        OSD_Printf("Demo frame verification failed: wall[] CRC different! %lu vs %lu\n", crcv, crcdv);
+    }
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)sector, sizeof(sector));
+    crc32finish(&crcv);
+    fread(&crcdv, sizeof(unsigned long), 1, demoverificationfilep);
+    if (crcdv != crcv)
+    {
+        OSD_Printf("Demo frame verification failed: sector[] CRC different! %lu vs %lu\n", crcv, crcdv);
+    }
+    
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)sprite, sizeof(sprite));
+    crc32finish(&crcv);
+    fread(&crcdv, sizeof(unsigned long), 1, demoverificationfilep);
+    if (crcdv != crcv)
+    {
+        OSD_Printf("Demo frame verification failed: sprite[] CRC different! %lu vs %lu\n", crcv, crcdv);
+    }
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)spriteext, sizeof(spriteext));
+    crc32finish(&crcv);
+    fread(&crcdv, sizeof(unsigned long), 1, demoverificationfilep);
+    if (crcdv != crcv)
+    {
+        OSD_Printf("Demo frame verification failed: spriteext[] CRC different! %lu vs %lu\n", crcv, crcdv);
+    }
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)msx, sizeof(msx));
+    crc32finish(&crcv);
+    fread(&crcdv, sizeof(unsigned long), 1, demoverificationfilep);
+    if (crcdv != crcv)
+    {
+        OSD_Printf("Demo frame verification failed: msx[] CRC different! %lu vs %lu\n", crcv, crcdv);
+    }
+
+    initcrc32table();
+    crc32init(&crcv);
+    crc32block(&crcv, (unsigned char *)msy, sizeof(msy));
+    crc32finish(&crcv);
+    fread(&crcdv, sizeof(unsigned long), 1, demoverificationfilep);
+    if (crcdv != crcv)
+    {
+        OSD_Printf("Demo frame verification failed: msy[] CRC different! %lu vs %lu\n", crcv, crcdv);
+    }
+
+    fread(&dv_ps, sizeof(dv_ps), 1, demoverificationfilep);
+    if (dv_ps[connecthead].posx != ps[connecthead].posx ||
+        dv_ps[connecthead].posy != ps[connecthead].posy ||
+        dv_ps[connecthead].posz != ps[connecthead].posz)
+    {
+        OSD_Printf("Demo frame verification failed: Player %lu position is different! x:%lu vs x:%lu, y:%lu vs y:%lu, z:%lu vs z:%lu\n", connecthead, ps[connecthead].posx, dv_ps[connecthead].posx, ps[connecthead].posy, dv_ps[connecthead].posy, ps[connecthead].posz, dv_ps[connecthead].posz);
+    }
+
+    fread(&dv_randomseed, sizeof(randomseed), 1, demoverificationfilep);
+    if (dv_randomseed != randomseed)
+    {
+        OSD_Printf("Demo frame verification failed: randomseed different! %lu vs %lu\n", randomseed, dv_randomseed);
+        //randomseed = dv_randomseed;
+    }
+    fread(&dv_global_random, sizeof(global_random), 1, demoverificationfilep);
+    if (dv_global_random != global_random)
+    {
+        OSD_Printf("Demo frame verification failed: global_random different! %hu vs %hu\n", global_random, dv_global_random);
+        //global_random = dv_global_random;
+    }
+
+    /* else if (ud.reccnt % 100 != 0)
+    {
+        return;
+    }
+
+#ifdef _DEBUG
+    short k;
+    char scriptptrs[MAXSCRIPTSIZE];
+    long i, j, x;
+
+    if (fread(&dv_numwalls, 2, 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_numwalls, &numwalls, sizeof(dv_numwalls))) faildemoframeverification("difference in numwalls");
+
+    if (fread(&dv_wall[0], sizeof(walltype), MAXWALLS, demoverificationfilep) != MAXWALLS) goto corrupt;
+    if (memcmp(&dv_wall[0], &wall[0], sizeof(dv_wall))) faildemoframeverification("difference in wall[]");
+    if (fread(&dv_numsectors, 2, 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_numsectors, &numsectors, sizeof(dv_numsectors))) faildemoframeverification("difference in numsectors");
+    if (fread(&dv_sector[0], sizeof(sectortype), MAXSECTORS, demoverificationfilep) != MAXSECTORS) goto corrupt;
+    if (memcmp(&dv_sector[0], &sector[0], sizeof(dv_sector))) faildemoframeverification("difference in sector[]");
+    if (fread(&dv_sprite[0], sizeof(spritetype), MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
+    if (memcmp(&dv_sprite[0], &sprite[0], sizeof(dv_sprite))) faildemoframeverification("difference in sprite[]");
+    if (fread(&dv_spriteext[0], sizeof(spriteexttype), MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
+    if (memcmp(&dv_spriteext[0], &spriteext[0], sizeof(dv_spriteext))) faildemoframeverification("difference in spriteext[]");
+    if (fread(&dv_headspritesect[0], 2, MAXSECTORS + 1, demoverificationfilep) != MAXSECTORS + 1) goto corrupt;
+    if (memcmp(&dv_headspritesect[0], &headspritesect[0], sizeof(dv_headspritesect))) faildemoframeverification("difference in headspritesect[]");
+    if (fread(&dv_prevspritesect[0], 2, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
+    if (memcmp(&dv_prevspritesect[0], &prevspritesect[0], sizeof(dv_prevspritesect))) faildemoframeverification("difference in prevspritesect[]");
+    if (fread(&dv_nextspritesect[0], 2, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
+    if (memcmp(&dv_nextspritesect[0], &nextspritesect[0], sizeof(dv_nextspritesect))) faildemoframeverification("difference in nextspritesect[]");
+    if (fread(&dv_headspritestat[0], 2, MAXSTATUS + 1, demoverificationfilep) != MAXSTATUS + 1) goto corrupt;
+    if (memcmp(&dv_headspritestat[0], &headspritestat[0], sizeof(dv_headspritestat))) faildemoframeverification("difference in headspritestat[]");
+    if (fread(&dv_prevspritestat[0], 2, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
+    if (memcmp(&dv_prevspritestat[0], &prevspritestat[0], sizeof(dv_prevspritestat))) faildemoframeverification("difference in prevspritestat[]");
+    if (fread(&dv_nextspritestat[0], 2, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
+    if (memcmp(&dv_nextspritestat[0], &nextspritestat[0], sizeof(dv_nextspritestat))) faildemoframeverification("difference in nextspritestat[]");
+    if (fread(&dv_numcyclers, sizeof(dv_numcyclers), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_numcyclers, &numcyclers, sizeof(dv_numcyclers))) faildemoframeverification("difference in numcyclers");
+    if (fread(&dv_cyclers[0][0], 12, MAXCYCLERS, demoverificationfilep) != MAXCYCLERS) goto corrupt;
+    if (memcmp(&dv_cyclers[0][0], &cyclers[0][0], sizeof(dv_cyclers))) faildemoframeverification("difference in cyclers[][]");
+    if (fread(dv_ps, sizeof(dv_ps), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_ps, &ps, sizeof(dv_ps))) faildemoframeverification("difference in ps");
+    if (fread(dv_po, sizeof(dv_po), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_po, &po, sizeof(dv_po))) faildemoframeverification("difference in po");
+    if (fread(&dv_numanimwalls, sizeof(dv_numanimwalls), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_numanimwalls, &numanimwalls, sizeof(dv_numanimwalls))) faildemoframeverification("difference in numanimwalls");
+    if (fread(&dv_animwall, sizeof(dv_animwall), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_animwall, &animwall, sizeof(dv_animwall))) faildemoframeverification("difference in animwall");
+    if (fread(&dv_msx[0], sizeof(long), sizeof(dv_msx) / sizeof(long), demoverificationfilep) != sizeof(dv_msx) / sizeof(long)) goto corrupt;
+    if (memcmp(&dv_msx[0], &msx[0], sizeof(dv_msx))) faildemoframeverification("difference in msx[]");
+    if (fread(&dv_msy[0], sizeof(long), sizeof(dv_msy) / sizeof(long), demoverificationfilep) != sizeof(dv_msy) / sizeof(long)) goto corrupt;
+    if (memcmp(&dv_msy[0], &msy[0], sizeof(dv_msy))) faildemoframeverification("difference in msy[]");
+    if (fread((short *)&dv_spriteqloc, sizeof(short), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_spriteqloc, &spriteqloc, sizeof(dv_spriteqloc))) faildemoframeverification("difference in spriteqloc");
+    if (fread((short *)&dv_spriteqamount, sizeof(short), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_spriteqamount, &spriteqamount, sizeof(dv_spriteqamount))) faildemoframeverification("difference in spriteqamount");
+    if (fread((short *)&dv_spriteq[0], sizeof(short), spriteqamount, demoverificationfilep) != spriteqamount) goto corrupt;
+    if (memcmp(&dv_spriteq[0], &spriteq[0], sizeof(dv_spriteq))) faildemoframeverification("difference in spriteq[]");
+    if (fread(&dv_mirrorcnt, sizeof(short), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_mirrorcnt, &mirrorcnt, sizeof(dv_mirrorcnt))) faildemoframeverification("difference in mirrorcnt");
+    if (fread(&dv_mirrorwall[0], sizeof(short), 64, demoverificationfilep) != 64) goto corrupt;
+    if (memcmp(&dv_mirrorwall[0], &mirrorwall[0], sizeof(dv_mirrorwall))) faildemoframeverification("difference in mirrorwall[]");
+    if (fread(&dv_mirrorsector[0], sizeof(short), 64, demoverificationfilep) != 64) goto corrupt;
+    if (memcmp(&dv_mirrorsector[0], &mirrorsector[0], sizeof(dv_mirrorsector))) faildemoframeverification("difference in mirrorsector[]");
+    if (fread(&dv_show2dsector[0], sizeof(char), MAXSECTORS >> 3, demoverificationfilep) != (MAXSECTORS >> 3)) goto corrupt;
+    if (memcmp(&dv_show2dsector[0], &show2dsector[0], sizeof(dv_show2dsector))) faildemoframeverification("difference in show2dsector[]");
+    if (fread(&dv_actortype[0], sizeof(char), MAXTILES - VIRTUALTILES, demoverificationfilep) != MAXTILES - VIRTUALTILES) goto corrupt;
+    if (memcmp(&dv_actortype[0], &actortype[0], sizeof(dv_actortype))) faildemoframeverification("difference in actortype[]");
+
+    if (fread(&dv_numclouds, sizeof(dv_numclouds), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_numclouds, &numclouds, sizeof(dv_numclouds))) faildemoframeverification("difference in numclouds");
+    if (fread(&dv_clouds[0], sizeof(short) << 7, 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_clouds[0], &clouds[0], sizeof(dv_clouds))) faildemoframeverification("difference in clouds[]");
+    if (fread(&dv_cloudx[0], sizeof(short) << 7, 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_cloudx[0], &cloudx[0], sizeof(dv_cloudx))) faildemoframeverification("difference in cloudx[]");
+    if (fread(&dv_cloudy[0], sizeof(short) << 7, 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_cloudy[0], &cloudy[0], sizeof(dv_cloudy))) faildemoframeverification("difference in cloudy[]");
+
+    if (fread(&scriptptrs[0], 1, MAXSCRIPTSIZE, demoverificationfilep) != MAXSCRIPTSIZE) goto corrupt;
+    if (fread(&dv_script[0], 4, MAXSCRIPTSIZE, demoverificationfilep) != MAXSCRIPTSIZE) goto corrupt;
+    for (i = 0; i < MAXSCRIPTSIZE; i++)
+    {
+        if (scriptptrs[i])
+        {
+            j = (long)dv_script[i] + (long)&dv_script[0];
+            dv_script[i] = j;
+        }
+    }
+
+    if (fread(&dv_actorscrptr[0], 4, MAXTILES - VIRTUALTILES, demoverificationfilep) != MAXTILES - VIRTUALTILES) goto corrupt;
+    for (i = 0; i < MAXTILES - VIRTUALTILES; i++)
+    {
+        if (dv_actorscrptr[i])
+        {
+            j = (long)dv_actorscrptr[i] + (long)&dv_script[0];
+            dv_actorscrptr[i] = (long *)j;
+        }
+    }
+
+    if (fread(&scriptptrs[0], 1, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
+    if (fread(&dv_hittype[0], sizeof(struct weaponhit), MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
+    if (memcmp(&dv_hittype[0], &hittype[0], sizeof(dv_hittype))) faildemoframeverification("difference in hittype[]");
+
+    for (i = 0; i<MAXSPRITES; i++)
+    {
+        j = (long)(&dv_script[0]);
+        if (scriptptrs[i] & 1) T2 += j;
+        if (scriptptrs[i] & 2) T5 += j;
+        if (scriptptrs[i] & 4) T6 += j;
+    }
+
+    if (memcmp(&dv_script[0], &script[0], sizeof(dv_script))) faildemoframeverification("difference in script[]");
+    if (memcmp(&dv_actorscrptr[0], &actorscrptr[0], sizeof(dv_actorscrptr))) faildemoframeverification("difference in actorscrptr[]");
+
+    if (fread(&dv_lockclock, sizeof(dv_lockclock), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_lockclock, &lockclock, sizeof(dv_lockclock))) faildemoframeverification("difference in lockclock");
+    if (fread(&dv_pskybits, sizeof(dv_pskybits), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_pskybits, &pskybits, sizeof(dv_pskybits))) faildemoframeverification("difference in pskybits");
+    if (fread(&dv_pskyoff[0], sizeof(dv_pskyoff[0]), MAXPSKYTILES, demoverificationfilep) != MAXPSKYTILES) goto corrupt;
+    if (memcmp(&dv_pskyoff[0], &pskyoff[0], sizeof(dv_pskyoff))) faildemoframeverification("difference in pskyoff[]");
+
+    if (fread(&dv_animatecnt, sizeof(dv_animatecnt), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_animatecnt, &animatecnt, sizeof(dv_animatecnt))) faildemoframeverification("difference in animatecnt");
+    if (fread(&dv_animatesect[0], 2, MAXANIMATES, demoverificationfilep) != MAXANIMATES) goto corrupt;
+    if (memcmp(&dv_animatesect[0], &animatesect[0], sizeof(dv_animatesect))) faildemoframeverification("difference in animatesect[]");
+    if (fread(&dv_animateptr[0], 4, MAXANIMATES, demoverificationfilep) != MAXANIMATES) goto corrupt;
+    for (i = dv_animatecnt - 1; i >= 0; i--) dv_animateptr[i] = (long *)((long)dv_animateptr[i] + (long)(&dv_sector[0]));
+    if (memcmp(&dv_animateptr[0], &animateptr[0], sizeof(dv_animateptr))) faildemoframeverification("difference in animateptr[]");
+    if (fread(&dv_animategoal[0], 4, MAXANIMATES, demoverificationfilep) != MAXANIMATES) goto corrupt;
+    if (memcmp(&dv_animategoal[0], &animategoal[0], sizeof(dv_animategoal))) faildemoframeverification("difference in animategoal[]");
+    if (fread(&dv_animatevel[0], 4, MAXANIMATES, demoverificationfilep) != MAXANIMATES) goto corrupt;
+    if (memcmp(&dv_animatevel[0], &animatevel[0], sizeof(dv_animatevel))) faildemoframeverification("difference in animatevel[]");
+
+    if (fread(&dv_earthquaketime, sizeof(dv_earthquaketime), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_earthquaketime, &earthquaketime, sizeof(dv_earthquaketime))) faildemoframeverification("difference in earthquaketime");
+    if (fread(&dv_ud_from_bonus, sizeof(dv_ud_from_bonus), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_ud_from_bonus, &ud.from_bonus, sizeof(dv_ud_from_bonus))) faildemoframeverification("difference in ud.from_bonus");
+    if (fread(&dv_ud_secretlevel, sizeof(dv_ud_secretlevel), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_ud_secretlevel, &ud.secretlevel, sizeof(dv_ud_secretlevel))) faildemoframeverification("difference in ud.secretlevel");
+
+    if (fread(&dv_ud_god, sizeof(dv_ud_god), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_ud_god, &ud.god, sizeof(dv_ud_god))) faildemoframeverification("difference in ud.god");
+    if (fread(&dv_ud_auto_run, sizeof(dv_ud_auto_run), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_ud_auto_run, &ud.auto_run, sizeof(dv_ud_auto_run))) faildemoframeverification("difference in ud.auto_run");
+    if (fread(&dv_ud_last_level, sizeof(dv_ud_last_level), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_ud_last_level, &ud.last_level, sizeof(dv_ud_last_level))) faildemoframeverification("difference in ud.last_level");
+    if (fread(&dv_ud_eog, sizeof(dv_ud_eog), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_ud_eog, &ud.eog, sizeof(dv_ud_eog))) faildemoframeverification("difference in ud.eog");
+
+    if (fread(&dv_camsprite, sizeof(dv_camsprite), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_camsprite, &camsprite, sizeof(dv_camsprite))) faildemoframeverification("difference in camsprite");
+    if (fread(&dv_connecthead, sizeof(connecthead), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_connecthead, &connecthead, sizeof(dv_connecthead))) faildemoframeverification("difference in connecthead");
+    if (fread(dv_connectpoint2, sizeof(dv_connectpoint2), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_connectpoint2, &connectpoint2, sizeof(dv_connectpoint2))) faildemoframeverification("difference in connectpoint2");
+    if (fread(&dv_numplayersprites, sizeof(dv_numplayersprites), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_numplayersprites, &numplayersprites, sizeof(dv_numplayersprites))) faildemoframeverification("difference in numplayersprites");
+    if (fread((short *)&dv_frags[0][0], sizeof(dv_frags), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_frags[0][0], &frags[0][0], sizeof(dv_frags))) faildemoframeverification("difference in frags[][]");
+
+    if (fread(&dv_randomseed, sizeof(dv_randomseed), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_randomseed, &randomseed, sizeof(dv_randomseed))) faildemoframeverification("difference in randomseed");
+    if (fread(&dv_global_random, sizeof(dv_global_random), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_global_random, &global_random, sizeof(dv_global_random))) faildemoframeverification("difference in global_random");
+    if (fread(&dv_parallaxyscale, sizeof(dv_parallaxyscale), 1, demoverificationfilep) != 1) goto corrupt;
+    if (memcmp(&dv_parallaxyscale, &parallaxyscale, sizeof(dv_parallaxyscale))) faildemoframeverification("difference in parallaxyscale");
+
+    return(0);
+corrupt:
+    Bsprintf(tempbuf, "Demo verification file is corrupt.");
+    gameexit(tempbuf);
+    return -1;
+#endif*/
+}
+
+void faildemoframeverification(char* msg)
+{
+    OSD_Printf("Demo frame verification failed: %s\n", msg);
+}
+
+
+char which_demo = 0;
+char in_menu = 0;
+uint32_t demo_break_time = 0;
+
+//POGOTODO: in a continuous demo, after the first level, the menu gets screwed up with a "Press Escape" menu preceding hiding
 // extern long syncs[];
 long playback(void)
 {
@@ -8829,7 +9613,17 @@ long playback(void)
 
     if( ready2send ) return 0;
 
-    foundemo = 0;
+    if (ud.recstat == 0)
+    {
+        ud.recstat = 4;
+    }
+
+    //POGO: store the current game times for when we start a new episode, so demo playback doesn't screw them up
+    ud.totaltimestore = ud.totaltime+ps[myconnectindex].player_par;
+    ud.realtotaltimestore = ud.realtotaltime;
+    ps[myconnectindex].player_par = 0;
+    //POGO: also store speedrun categories met
+    ud.speedrunCategoriesMet <<= 3;
 
     RECHECK:
 
@@ -8840,7 +9634,18 @@ long playback(void)
 
     flushperms();
 
-    if(numplayers < 2) foundemo = opendemoread(which_demo);
+    foundemo = 0;
+    if (ud.recstat == 3)
+    {
+        goto NODEMO;
+    }
+    if (numplayers < 2 &&
+        demo_break_time <= 0)
+    {
+        which_demo++;
+        if (which_demo == 10) which_demo = 1;
+        foundemo = opendemoread(which_demo);
+    }
 
     //pogokeen: Ensure that the menu won't be hidden/reset while prepping a new demo
     if (in_menu)
@@ -8849,31 +9654,53 @@ long playback(void)
     }
     ps[myconnectindex].gm |= MODE_DEMO;
 
+    PROGRESSDEMOLEVEL:
     if(foundemo == 0)
     {
-        if(which_demo > 1)
+        if(which_demo > 1 && demo_break_time <= 0)
         {
-            which_demo = 1;
+            which_demo = 0;
             goto RECHECK;
         }
+
+        NODEMO:
         fadepal(0,0,0, 0,63,7);
         setgamepalette(&ps[myconnectindex], palette, 1);	// JBF 20040308
+        if (ud.recstat == 2)
+        {
+            ud.recstat = 4;
+        } else if (ud.recstat == 4 && demo_break_time <= 0)
+        {
+            ud.recstat = 0;
+            ps[myconnectindex].gm |= MODE_MENU;
+        }
         drawbackground();
         menus();
         //ps[myconnectindex].palette = palette;
         nextpage();
         fadepal(0,0,0, 63,0,-7);
-        ud.reccnt = 0;
-    }
-    else
+        //ud.reccnt = 0;
+    } else
     {
         ud.recstat = 2;
-        which_demo++;
-        if(which_demo == 10) which_demo = 1;
-        if (enterlevel(MODE_DEMO)) return 1;
+        if (!ud.demoPlayerMode)
+        {
+            demo_break_time = TICSPERFRAME * 600;
+        }
+
+#if !CLASSIC_MENU
+        GUI_ShowBackground(false);
+#endif
+        if (enterlevel(MODE_DEMO | (ps[myconnectindex].gm & MODE_EOL))) return 1;
+
+        if (ud.totaltime == 0)
+        {
+            //POGO: If this is the first map in the demo, we should reset the prev speedrun categories met to all set
+            ud.speedrunCategoriesMet |= 0x7;
+        }
     }
 
-    if(foundemo == 0 || in_menu || KB_KeyWaiting() || numplayers > 1)
+    if((foundemo == 0 && demo_break_time <= 0) || in_menu || KB_KeyWaiting() || numplayers > 1)
     {
         FX_StopAllSounds();
         clearsoundlocks();
@@ -8896,7 +9723,7 @@ long playback(void)
                 i = 0;
                 l = min(ud.reccnt,RECSYNCBUFSIZ);
                 if (kdfread(recsync,sizeof(input)*ud.multimode,l/ud.multimode,recfilep) != l/ud.multimode) {
-					OSD_Printf("Demo %d is corrupt.\n", which_demo-1);
+					OSD_Printf("Demo %d is corrupt.\n", which_demo);
 					foundemo = 0;
 					ud.reccnt = 0;
 					kclose(recfilep);
@@ -8912,12 +9739,25 @@ long playback(void)
                i++;
                ud.reccnt--;
             }
-            domovethings();
+            debugSetReccnt(ud.reccnt);
+            //domovethings();
+            moveloop();
         }
 
-        if(foundemo == 0)
+        if (foundemo == 0)
+        {
             drawbackground();
-        else
+            if (ud.recstat == 4)
+            {
+                if (demo_break_time > 0)
+                {
+                    demo_break_time -= TICSPERFRAME;
+                } else
+                {
+                    goto RECHECK;
+                }
+            }
+        } else
         {
             nonsharedkeys();
 
@@ -8926,15 +9766,19 @@ long playback(void)
             {
                 ud.camerasprite = -1;
             }
-            displayrooms(screenpeek,j);
+            //POGOTODO: does this usenewaspect stuff make a difference?
+            r_usenewaspect = 1;
+            setaspect_new();
+            displayrooms(screenpeek, j);
+            r_usenewaspect = 0;
+            setaspect_new();
+            //POGO: Originally was simply:
+            //displayrooms(screenpeek,j);
             displayrest(j);
 
             if(ud.multimode > 1 && ps[myconnectindex].gm )
                 getpackets();
         }
-
-        if( (ps[myconnectindex].gm&MODE_MENU) && (ps[myconnectindex].gm&MODE_EOL) )
-            goto RECHECK;
 
         if (KB_KeyPressed(sc_Escape))
         {
@@ -8994,7 +9838,17 @@ if (VOLUMEONE) {
             return 0;
         }
     }
-    kclose(recfilep);
+    
+    //POGO: we've hit the end of the level demo, attempt to progress to the next one
+    //      (if the recording ends, the file will be closed in demoreadnewboard() )
+    if (demoreadnewboard())
+    {
+        goto PROGRESSDEMOLEVEL;
+    } else if (ud.demoPlayerMode && (ud.multimode < 2 || ud.coop))
+    {
+        ps[myconnectindex].gm |= MODE_EOL;
+        dobonus(0);
+    }
 
 #if 0
 	// sync checker
@@ -9764,7 +10618,13 @@ char domovethings(void)
             syncvalhead[myconnectindex]++;
       }
 
-    if(ud.recstat == 1) record();
+      if (ud.recstat == 1 || ud.recstat == 3)
+      {
+          record();
+      } else if (ud.recstat == 2)
+      {
+          verifydemoframe();
+      }
 
     if( ud.pause_on == 0 )
     {
@@ -9858,6 +10718,8 @@ void doorders(void)
     while( !KB_KeyWaiting() ) { handleevents(); getpackets(); }
 }
 
+//POGOTODO: add "IL Qualifies For:" and "RTA/SS/MS Qualifies For:" to the intermission screen
+//POGOTODO: should I simplify the ones on the level stats to show only the most specific run category qualified for so far?
 void dobonus(char bonusonly)
 {
     short t, r, tinc,gfx_offset;
@@ -9866,7 +10728,7 @@ void dobonus(char bonusonly)
 	int clockpad = 2;
 	char *lastmapname;
 	int32 playerbest = -1;
-	char *yourtime = "Your Time:", *besttime = "Your Best Time:";
+	char *yourtime = "IL Time:", *besttime = "Best IL Time:";
     char nickname[1024];
 
     
@@ -9888,12 +10750,21 @@ void dobonus(char bonusonly)
        350, 380,VICTORY1+8,86,59
     };
 
-	if (ud.volume_number == 0 && ud.last_level == 8 && boardfilename[0]) {
-		lastmapname = Bstrrchr(boardfilename,'\\');
-		if (!lastmapname) lastmapname = Bstrrchr(boardfilename,'/');
-		if (!lastmapname) lastmapname = boardfilename;
-	} else lastmapname = level_names[(ud.volume_number*11)+ud.last_level-1];
-	
+    if (ud.recstat != 2)
+    {
+	    if (ud.volume_number == 0 && ud.last_level == 8 && boardfilename[0]) {
+		    lastmapname = Bstrrchr(boardfilename,'\\');
+		    if (!lastmapname) lastmapname = Bstrrchr(boardfilename,'/');
+		    if (!lastmapname) lastmapname = boardfilename;
+	    } else lastmapname = level_names[(ud.volume_number*11)+ud.last_level-1];
+    } else
+    {
+        //POGO: if we are playing back a demo, don't show the level name, instead show the demo name
+        char demoName[10] = "demo_.dmo";
+        demoName[4] = (which_demo == 10 ? 'x' : '0'+which_demo);
+        lastmapname = demoName;
+    }
+
     bonuscnt = 0;
 
     fadepal(0,0,0, 0,64,7);
@@ -10299,8 +11170,8 @@ void dobonus(char bonusonly)
     if (ps[myconnectindex].player_par < playerbest || playerbest < 0) {
 	    CONFIG_SetMapBestTime(level_file_names[ud.volume_number*11+ud.last_level-1], ps[myconnectindex].player_par);
 	    if (playerbest >= 0) {
-		    yourtime = "New Best Time:";
-		    besttime = "Previous Best:";
+		    yourtime = "New Best IL Time:";
+		    besttime = "Previous IL Best:";
 	    }
     }
     
@@ -10385,8 +11256,14 @@ void dobonus(char bonusonly)
 
             if( totalclock > (60*3) )
             {
-		    yy = zz = 59;
+		        yy = zz = 30;
+                gametext(10,yy+9,"Prev Lvls Met:",0,2+8+16); yy+=10;
+                gametext(10,yy+9,"Curr IL Meets:",0,2+8+16); yy+=10;
                 gametext(10,yy+9,yourtime,0,2+8+16); yy+=10;
+                gametext(10,yy+9,"Total Time:",0,2+8+16); yy+=10;
+                gametext(10,yy+9,"Real IL Time:",0,2+8+16); yy+=10;
+                gametext(10,yy+9,"Total Real Time:",0,2+8+16); yy+=10;
+                yy += 5;
                 gametext(10,yy+9,"Par Time:",0,2+8+16); yy+=10;
 		if (!NAM) { gametext(10,yy+9,"3D Realms' Time:",0,2+8+16); yy+=10; }
 		gametext(10,yy+9,besttime,0,2+8+16); yy += 10;
@@ -10403,10 +11280,42 @@ void dobonus(char bonusonly)
                         sound(PIPEBOMB_EXPLODE);
                     }
 					
+                    sprintf(tempbuf,"%s",
+                            (ud.speedrunCategoriesMet & 0x4) ? "Max%" :
+                            (ud.speedrunCategoriesMet & 0x2) ? "100%" :
+                            (ud.speedrunCategoriesMet & 0x1) ? "100S" : "Any%");
+                    gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
+                    sprintf(tempbuf,"%s",
+                            (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                             ps[myconnectindex].actors_killed == ud.maxKills) ? "Max%" :
+                            (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                             ps[myconnectindex].actors_killed == ps[myconnectindex].max_actors_killed) ? "100%" :
+                            (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) ? "100S" : "Any%");
+                    gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
+
                     sprintf(tempbuf,"%0*ld:%02ld",clockpad,
                         (ps[myconnectindex].player_par/(26*60)),
                         (ps[myconnectindex].player_par/26)%60);
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
+
+                    sprintf(tempbuf, "%02lu:%02lu",
+                            ((ud.totaltime + ps[myconnectindex].player_par) / (26 * 60)),
+                            ((ud.totaltime + ps[myconnectindex].player_par) / 26) % 60);
+                    gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
+
+                    sprintf(tempbuf, "%02lu:%02lu.%03lu",
+                            ud.realtime/60000,
+                            (ud.realtime%60000) / 1000,
+                            ud.realtime%1000);
+                    gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
+
+                    sprintf(tempbuf, "%02lu:%02lu.%03lu",
+                            ud.realtotaltime/60000,
+                            (ud.realtotaltime%60000) / 1000,
+                            ud.realtotaltime%1000);
+                    gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
+
+                    yy += 5;
 
                     sprintf(tempbuf,"%0*ld:%02ld",clockpad,
                         (partime[ud.volume_number*11+ud.last_level-1]/(26*60)),
@@ -10437,6 +11346,7 @@ void dobonus(char bonusonly)
             {
                 gametext(10,yy+9,"Enemies Killed:",0,2+8+16); yy += 10;
                 gametext(10,yy+9,"Enemies Left:",0,2+8+16); yy += 10;
+                gametext(10,yy+9,"Enemies Left (Max%):",0,2+8+16); yy += 10;
 
                 if(bonuscnt == 2)
                 {
@@ -10461,9 +11371,13 @@ void dobonus(char bonusonly)
                     }
                     else
                     {
-                        if( (ps[myconnectindex].max_actors_killed-ps[myconnectindex].actors_killed) < 0 )
-                            sprintf(tempbuf,"%-3d",0);
-                        else sprintf(tempbuf,"%-3ld",ps[myconnectindex].max_actors_killed-ps[myconnectindex].actors_killed);
+                        //POGO: with the enemy kill tallies fixed, this should never be negative.
+                        //      If it is, I want to know about it.
+                        sprintf(tempbuf,"%-3ld",ps[myconnectindex].max_actors_killed-ps[myconnectindex].actors_killed);
+                        gametext((320>>2)+70,yy+9,tempbuf,0,2+8+16); yy += 10;
+
+                        //POGO: show Max% kills remaining
+                        sprintf(tempbuf,"%-3ld",ud.maxKills-ps[myconnectindex].actors_killed);
                         gametext((320>>2)+70,yy+9,tempbuf,0,2+8+16); yy += 10;
                     }
                 }

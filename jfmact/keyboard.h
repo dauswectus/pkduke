@@ -69,6 +69,7 @@ typedef int32 kb_scancode;
 #define  sc_F9           0x43
 #define  sc_F10          0x44
 #define  sc_F11          0x57
+//POGOTODO: redefine F12 to open the demo record menu in-game -- it is currently not being used for anything (everywhere it is being used is commented out)
 #define  sc_F12          0x58
 #define  sc_Kpad_Star    0x37
 #define  sc_Pause        0x59

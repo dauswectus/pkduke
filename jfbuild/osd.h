@@ -42,7 +42,7 @@ void OSD_SetParameters(
 	);
 
 // sets the scancode for the key which activates the onscreen display
-void OSD_CaptureKey(int sc);
+void OSD_CaptureKey(int sc, char altKey);
 
 // handles keyboard input when capturing input. returns 0 if key was handled
 // or the scancode if it should be handled by the game.

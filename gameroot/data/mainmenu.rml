@@ -1,6 +1,15 @@
 <rml>
 <head>
 	<link type="text/css" href="menu.rcss"/>
+	<style>
+	#betatag {
+	    position: absolute;
+	    display: block;
+	    left: 600px;
+	    top: 560px;
+	    z-index: -1;
+	}
+	</style>
 	<title>DUKE NUKEM</title>
 </head>
 
@@ -14,11 +23,15 @@
 <cursor id="cursor-left"/>
 <cursor id="cursor-right"/>
 
+<!--<img id="betatag" src="assets/DNmpBeta1.tga"></img>-->
+
 <div class="game-menu" style="top:400px;">
     <div id="new-game" submenu="menu-episodes">NEW GAME</div>
+    <div id="user-maps" submenu="menu-usermaps">USER MAPS</div>
+    <!--<div id="multiplayer" submenu="menu-multiplayer">MULTIPLAYER</div>-->
     <div id="options" submenu="menu-options">OPTIONS</div>
     <div id="load-game" submenu="menu-load">LOAD GAME</div>
-    <div id="help" command="open-hub">COMMUNITY HUB</div>
+    <div id="help" submenu="menu-help">HELP</div>
     <div id="credits" submenu="menu-credits">CREDITS</div>
     <div id="quit" command="game-quit">QUIT GAME</div>
 </div>

@@ -3219,7 +3219,7 @@ if (PLUTOPAK) {
 
 			    KeyboardKeys[function][whichkey] = KB_GetLastScanCode();
 			    if (function == gamefunc_Show_Console)
-					OSD_CaptureKey(KB_GetLastScanCode());
+					OSD_CaptureKey(KB_GetLastScanCode(), false);
 		    	else
 		        	CONTROL_MapKey( function, KeyboardKeys[function][0], KeyboardKeys[function][1] );
 			}
@@ -5395,6 +5395,24 @@ void dnNewGame(GameDesc *gamedesc) {
     ud.fraglimit = gamedesc->fraglimit;
     ud.timelimit = gamedesc->timelimit*60*1000;
     ud.matchtime = 0;
+
+    //POGOTODO: should this instead be in the newgame() method?
+    //          If it's here, does this handle skipping to a level using command-line params properly?
+    //          But, if it's in the newgame() method, would that negatively harm multi-episode demo playback?
+    //          Maybe we simply have to set startedEpisode properly somewhere else as well?
+    ps[myconnectindex].player_par = 0;
+    ud.totaltime = ud.totaltimestore;
+    ud.realtotaltime = ud.realtotaltimestore;
+    if (ud.recstat != 3 && ud.startedepisode & (1 << gamedesc->volume))
+    {
+        ud.totaltime = 0;
+        ud.realtime = 0;
+        ud.realtotaltime = 0;
+        ud.startedepisode = 0;
+        ud.speedrunCategoriesMet = 0xFF;
+    }
+    ud.startedepisode |= 1 << gamedesc->volume;
+    ud.lastclock = getticks();
     
 	ud.m_player_skill		= gamedesc->player_skill;
 	ud.m_respawn_monsters	= gamedesc->respawn_monsters;
@@ -5460,6 +5478,9 @@ void dnNewGame(GameDesc *gamedesc) {
 	newgame(ud.m_volume_number,ud.m_level_number,ud.m_player_skill);
 	iRet = enterlevel(MODE_GAME);
 
+    //POGO: restore stored speedrun category info
+    ud.speedrunCategoriesMet >>= 3;
+
 	//g_LoadingLevel = 0;
 
 	if (iRet) {
@@ -5476,7 +5497,7 @@ extern int skip_next_motion;
 void dnHideMenu() {
     skip_next_motion = 1;
 
-	ps[myconnectindex].gm &= ~MODE_MENU;
+    ps[myconnectindex].gm &= ~MODE_MENU;
     if(ud.multimode < 2 && ud.recstat != 2) {
         ready2send = 1;
         totalclock = ototalclock;

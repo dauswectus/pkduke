@@ -179,6 +179,7 @@ public:
     void ShowVideoSettingsMenu();
     void ShowGameOptionsMenu();
     void ShowQuitConfirmation();
+    void ShowBackground(char visible);
     
     void OnLobbyCreated(lobby_info_t *lobby_info);
     void OnLobbyListUpdated();

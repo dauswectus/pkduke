@@ -136,5 +136,10 @@ void GUI_ShowQuitConfirmation(void) {
 	gui->ShowQuitConfirmation();
 }
 
+extern "C"
+void GUI_ShowBackground(char visible) {
+    assert(gui != NULL);
+    gui->ShowBackground(visible);
+}
 
 #endif

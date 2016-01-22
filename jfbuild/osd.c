@@ -51,7 +51,8 @@ static char osdvisible=0;		// onscreen display visible?
 static int  osdhead=0; 			// topmost visible line number
 static BFILE *osdlog=NULL;		// log filehandle
 static char osdinited=0;		// text buffer initialised?
-static int  osdkey=0x45;		// numlock shows the osd
+static int  osdkey0=0x45;		// numlock shows the osd
+static int  osdkey1=-1;		    // alt. osd key
 static int  keytime=0;
 
 // command prompt editing
@@ -334,9 +335,15 @@ void OSD_SetParameters(
 //
 // OSD_CaptureKey() -- Sets the scancode for the key which activates the onscreen display
 //
-void OSD_CaptureKey(int sc)
+void OSD_CaptureKey(int sc, char altKey)
 {
-	osdkey = sc;
+    if (altKey)
+    {
+        osdkey1 = sc;
+    } else
+    {
+        osdkey0 = sc;
+    }
 }
 
 
@@ -354,11 +361,9 @@ int OSD_HandleKey(int sc, int press)
 	
 	if (!osdinited) return sc;
 
-	if (sc == osdkey) {
-		if (press) {
-			OSD_ShowDisplay(osdvisible ^ 1);
-			bflushchars();
-		}
+	if (sc == osdkey0 || sc == osdkey1) {
+		OSD_ShowDisplay(osdvisible ^ 1);
+		bflushchars();
 		return 0;//sc;
 	} else if (!osdvisible) {
 		return sc;
@@ -652,7 +657,6 @@ void OSD_ShowDisplay(int onf)
 	osdeditcontrol = 0;
 	osdeditshift = 0;
 
-	grabmouse(osdvisible == 0);
 	onshowosd(osdvisible);
 	if (osdvisible) releaseallbuttons();
 }

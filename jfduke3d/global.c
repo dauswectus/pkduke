@@ -149,6 +149,45 @@ short weaponsandammosprites[15] = {
         FREEZEAMMO
     };
 
+const short SPAWNABLE_ENEMY_PIC_NUMS[] = {EGG,
+                                          SHARK,
+                                          LIZTROOP,
+                                          LIZTROOPRUNNING,
+                                          LIZTROOPSTAYPUT,
+                                          LIZTROOPSHOOT,
+                                          LIZTROOPJETPACK,
+                                          LIZTROOPONTOILET,
+                                          LIZTROOPJUSTSIT,
+                                          LIZTROOPDUCKING,
+                                          1810, //CANNON
+                                          OCTABRAIN,
+                                          OCTABRAINSTAYPUT,
+                                          DRONE,
+                                          COMMANDER,
+                                          COMMANDERSTAYPUT,
+                                          RECON,
+                                          TANK,
+                                          PIGCOP,
+                                          PIGCOPSTAYPUT,
+                                          PIGCOPDIVE,
+                                          LIZMAN,
+                                          LIZMANSTAYPUT,
+                                          LIZMANSPITTING,
+                                          LIZMANJUMP,
+                                          ROTATEGUN,
+                                          GREENSLIME,
+                                          ORGANTIC,
+                                          BOSS1,
+                                          BOSS1STAYPUT,
+                                          BOSS2,
+                                          BOSS3,
+                                          NEWBEAST,
+                                          NEWBEASTSTAYPUT,
+                                          NEWBEASTHANG,
+                                          NEWBEASTJUMP,
+                                          BOSS4,
+                                          BOSS4STAYPUT};
+
 long impact_damage;
 
         //GLOBAL.C - replace the end "my's" with this

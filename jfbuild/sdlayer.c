@@ -391,7 +391,9 @@ int initinput(void)
 		strncpy((char *)keynames[ keytranslation[i] ], SDL_GetKeyName(i), sizeof(keynames[i])-1);
 	}
 
-	if (!SDL_InitSubSystem(SDL_INIT_JOYSTICK)) {
+    //POGO: joystick initialization was hanging until context switching on my computer
+    //      Disable joystick support for now (since Megaton 1.3.2 lacks JFDuke's joystick support anyway -- it was re-added in the SDL2 1.4.0 version)
+	/*if (!SDL_InitSubSystem(SDL_INIT_JOYSTICK)) {
 		i = SDL_NumJoysticks();
 		initprintf("%d joystick(s) found\n",i);
 		for (j=0;j<i;j++) initprintf("  %d. %s\n", j+1, SDL_JoystickName(j));
@@ -409,7 +411,7 @@ int initinput(void)
 			joyaxis = (long *)Bcalloc(joynumaxes, sizeof(long));
 			joyhat = (long *)Bcalloc(joynumhats, sizeof(long));
 		}
-	}
+	}*/
 
 	return 0;
 }
@@ -1339,6 +1341,10 @@ int handleevents(void)
 					keyasciififoend = ((keyasciififoend+1)&(KEYFIFOSIZ-1));
 				}
 				code = keytranslation[ev.key.keysym.sym];
+
+                if (OSD_HandleKey(code, (ev.key.type == SDL_KEYDOWN)) == 0)
+                    break;
+
                 SetKey(code, 1);
                 if (keypresscallback) {
                     keypresscallback(code, 1);
@@ -1352,6 +1358,10 @@ int handleevents(void)
                     dnReleaseKey(ev.key.keysym.sym);
                 }
                 code = keytranslation[ev.key.keysym.sym];
+
+                if (OSD_HandleKey(code, (ev.key.type == SDL_KEYDOWN)) == 0)
+                    break;
+
                 SetKey(code, 0);
                 if (keypresscallback) {
                     keypresscallback(code, 0);
@@ -1650,12 +1660,12 @@ void dnGetCurrentVideoMode(VideoMode *videomode) {
 	videomode->bpp = sdl_surface->format->BitsPerPixel;
 }
 
-/*
+
 int dnTranslateSDLKey(SDLKey key) {
     return keytranslation[key];
 }
 
-const char* dnGetKeyName(int key) {
+/*const char* dnGetKeyName(int key) {
     const char* name = KB_ScanCodeToString(key);
     return name[0] ? name : "None";
 }

@@ -3652,6 +3652,10 @@ void moveactors(void)
                     IFHIT
                     {
                         if(j == FREEZEBLAST) goto BOLT;
+
+                        //POGO: record when a frozen slimer is killed
+                        ps[p].actors_killed++;
+                        dnRecordEnemyKilled();
                         for(j=16; j >= 0 ;j--)
                         {
                             k = EGS(SECT,SX,SY,SZ,GLASSPIECES+(j%3),-32,36,36,TRAND&2047,32+(TRAND&63),1024-(TRAND&1023),i,5);
@@ -3787,8 +3791,12 @@ void moveactors(void)
                     {
                         spritesound(SLIM_DYING,i);
 
-                        ps[p].actors_killed ++;
-                        dnRecordEnemyKilled();
+                        //POGO: Fix slimes freezing bug which allowed incrementing the kill counter even if not killed
+                        if (j != FREEZEBLAST)
+                        {
+                            ps[p].actors_killed++;
+                            dnRecordEnemyKilled();
+                        }
                         if(ps[p].somethingonplayer == i)
                             ps[p].somethingonplayer = -1;
 
@@ -3865,7 +3873,11 @@ void moveactors(void)
 				    // to decrease the maximum kill count by one.
 				    // JBF 20051024: additionally, the enemy has to be alive for
 				    // the max enemy count to be decremented.
-				    if (sprite[t[5]].extra > 0) ps[myconnectindex].max_actors_killed--;
+				    if (sprite[t[5]].extra > 0)
+                    {
+                        ps[myconnectindex].max_actors_killed--;
+                        ud.maxKills--;
+                    }
 			    }
                         }
                     }
@@ -6742,6 +6754,7 @@ void moveeffectors(void)   //STATNUM 3
 
             case 27:
 
+                //POGOTODO: are demo cameras are screwing up demo playback?
                 if(ud.recstat == 0) break;
 
                 hittype[i].tempang = s->ang;
@@ -6751,28 +6764,35 @@ void moveeffectors(void)   //STATNUM 3
                 {
                     if( t[0] < 0 )
                     {
-                        ud.camerasprite = i;
+                        if (ud.recstat == 2)
+                        {
+                            ud.camerasprite = i;
+                        }
                         t[0]++;
                     }
-                    else if(ud.recstat == 2 && ps[p].newowner == -1)
+                    else if(ps[p].newowner == -1)
                     {
                         if(cansee(s->x,s->y,s->z,SECT,ps[p].posx,ps[p].posy,ps[p].posz,ps[p].cursectnum))
                         {
                             if(x < (long)((unsigned)sh))
                             {
-                                ud.camerasprite = i;
+                                if (ud.recstat == 2)
+                                {
+                                    ud.camerasprite = i;
+                                }
                                 t[0] = 999;
                                 s->ang += getincangle(s->ang,getangle(ps[p].posx-s->x,ps[p].posy-s->y))>>3;
                                 SP = 100+((s->z-ps[p].posz)/257);
-
                             }
                             else if(t[0] == 999)
                             {
                                 if(ud.camerasprite == i)
                                     t[0] = 0;
                                 else t[0] = -10;
-                                ud.camerasprite = i;
-
+                                if (ud.recstat == 2)
+                                {
+                                    ud.camerasprite = i;
+                                }
                             }
                         }
                         else
@@ -6784,7 +6804,10 @@ void moveeffectors(void)   //STATNUM 3
                                 if(ud.camerasprite == i)
                                     t[0] = 0;
                                 else t[0] = -20;
-                                ud.camerasprite = i;
+                                if (ud.recstat == 2)
+                                {
+                                    ud.camerasprite = i;
+                                }
                             }
                         }
                     }

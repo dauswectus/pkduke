@@ -655,7 +655,7 @@ void resetprestat(short snum,char g)
     numinterpolations = 0;
     startofdynamicinterpolations = 0;
 
-    if( ( (g&MODE_EOL) != MODE_EOL && numplayers < 2) || (ud.coop != 1 && numplayers > 1) )
+    if ((/*g&MODE_DEMO == 0 && */(g&MODE_EOL) != MODE_EOL && numplayers < 2) || (ud.coop != 1 && numplayers > 1))
     {
         resetweapons(snum);
         resetinventory(snum);
@@ -1016,6 +1016,194 @@ void prelevel(char g)
             wall[j].overpicnum = MIRROR;
         }
     }
+
+    short touchplateIndices[MAXSPRITES];
+    int touchplatesLength = 0;
+    for (i=0; i < MAXSPRITES; i++)
+    {
+        if (PN == TOUCHPLATE)
+        {
+            touchplateIndices[touchplatesLength] = i;
+            touchplatesLength++;
+        }
+    }
+
+    //POGO: count max kills available for max%
+    ud.maxKills = 0;
+    //OSD_Printf("Starting real search:\n");
+    for (i=0; i < MAXSPRITES; i++)
+    {
+        if (sprite[i].statnum >= MAXSTATUS)
+        {
+            continue;
+        }
+
+        for (short* pSpawnablePN = SPAWNABLE_ENEMY_PIC_NUMS; pSpawnablePN < SPAWNABLE_ENEMY_PIC_NUMS+sizeof(SPAWNABLE_ENEMY_PIC_NUMS)/sizeof(SPAWNABLE_ENEMY_PIC_NUMS[0]); ++pSpawnablePN)
+        {
+            if ((PN == *pSpawnablePN && (PN == EGG || SLT <= ud.player_skill) && (PN != RECON || PL == 0 || ud.multimode > 1)) ||
+                ((PN == CANWITHSOMETHING || PN == CANWITHSOMETHING2 || PN == CANWITHSOMETHING3 || PN == CANWITHSOMETHING4) && SLT == *pSpawnablePN) ||
+                ((PN == MONK || PN == LUKE || PN == INDY || PN == JURYGUY) && SHT == *pSpawnablePN))
+            {
+                ud.maxKills++;
+                //OSD_Printf("Found Enemy: %hu (Index: %hu)\n", PN, i);
+                goto NEXTSPRITE;
+            } else if (PN == RESPAWN && SHT == *pSpawnablePN && SHT != EGG && SHT != RECON && (PL != 1 || ud.multimode > 1))
+            {
+                //POGO: handle sprite triggers
+                for (int j = 0; j < MAXSPRITES; j++)
+                {
+                    if (sprite[i].statnum >= MAXSTATUS)
+                    {
+                        continue;
+                    }
+
+                    if ((sprite[j].lotag == SLT &&
+                         (sprite[j].picnum == TOUCHPLATE ||
+                          sprite[j].picnum == ACCESSSWITCH ||
+                          sprite[j].picnum == ACCESSSWITCH2 ||
+                          ((sprite[j].picnum == SLOTDOOR ||
+                            sprite[j].picnum == SLOTDOOR+1 ||
+                            sprite[j].picnum == LIGHTSWITCH ||
+                            sprite[j].picnum == LIGHTSWITCH+1 ||
+                            sprite[j].picnum == SPACEDOORSWITCH ||
+                            sprite[j].picnum == SPACEDOORSWITCH+1 ||
+                            sprite[j].picnum == SPACELIGHTSWITCH ||
+                            sprite[j].picnum == SPACELIGHTSWITCH+1 ||
+                            sprite[j].picnum == FRANKENSTINESWITCH ||
+                            sprite[j].picnum == FRANKENSTINESWITCH+1 ||
+                            sprite[j].picnum == DIPSWITCH ||
+                            sprite[j].picnum == DIPSWITCH+1 ||
+                            sprite[j].picnum == DIPSWITCH2 ||
+                            sprite[j].picnum == DIPSWITCH2+1 ||
+                            sprite[j].picnum == DIPSWITCH3 ||
+                            sprite[j].picnum == DIPSWITCH3+1 ||
+                            sprite[j].picnum == LIGHTSWITCH2 ||
+                            sprite[j].picnum == LIGHTSWITCH2+1 ||
+                            sprite[j].picnum == POWERSWITCH1 ||
+                            sprite[j].picnum == POWERSWITCH1+1 ||
+                            sprite[j].picnum == LOCKSWITCH1 ||
+                            sprite[j].picnum == LOCKSWITCH1+1 ||
+                            sprite[j].picnum == POWERSWITCH2 ||
+                            sprite[j].picnum == POWERSWITCH2+1 ||
+                            sprite[j].picnum == HANDSWITCH ||
+                            sprite[j].picnum == HANDSWITCH+1 ||
+                            sprite[j].picnum == PULLSWITCH ||
+                            sprite[j].picnum == PULLSWITCH+1 || 
+                            sprite[j].picnum == TECHSWITCH ||
+                            sprite[j].picnum == TECHSWITCH+1 ||
+                            sprite[j].picnum == ALIENSWITCH ||
+                            sprite[j].picnum == ALIENSWITCH+1) &&
+                            (sprite[j].pal <= 0 || (ud.multimode > 1 && ud.coop == 0))) ||
+                          sprite[j].picnum == TARGET ||
+                          sprite[j].picnum == DUCK)) ||
+                        (SLT-sprite[j].lotag >= 0 &&
+                         SLT-sprite[j].lotag <= 3 &&
+                         (sprite[j].pal <= 0 || (ud.multimode > 1 && ud.coop == 0)) &&
+                         (sprite[j].picnum == MULTISWITCH ||
+                          sprite[j].picnum == MULTISWITCH+1 ||
+                          sprite[j].picnum == MULTISWITCH+2 ||
+                          sprite[j].picnum == MULTISWITCH+3)) ||
+                        (sprite[j].yvel == SLT &&
+                         (sprite[j].picnum == NAKED1 ||
+                          sprite[j].picnum == PODFEM1 ||
+                          sprite[j].picnum == FEM1 ||
+                          sprite[j].picnum == FEM2 ||
+                          sprite[j].picnum == FEM3 ||
+                          sprite[j].picnum == FEM4 ||
+                          sprite[j].picnum == FEM5 ||
+                          sprite[j].picnum == FEM6 ||
+                          sprite[j].picnum == FEM7 ||
+                          sprite[j].picnum == FEM8 ||
+                          sprite[j].picnum == FEM9 ||
+                          sprite[j].picnum == FEM10 ||
+                          sprite[j].picnum == STATUE)))
+                    {
+                        //POGO: only count respawn sprites if their respective channel can be called by some trigger in the level
+                        ud.maxKills++;
+                        goto NEXTSPRITE;
+                    }
+                }
+
+                //POGO: handle wall switches
+                for(int j = 0; j < numwalls; j++)
+                {
+                    if (!(wall[j].cstat & 0x10) &&
+                        (wall[j].lotag == SLT &&
+                         (wall[j].picnum == ACCESSSWITCH ||
+                          wall[j].picnum == ACCESSSWITCH2 ||
+                          wall[j].picnum == SLOTDOOR ||
+                          wall[j].picnum == SLOTDOOR+1 ||
+                          wall[j].picnum == LIGHTSWITCH ||
+                          wall[j].picnum == LIGHTSWITCH+1 ||
+                          wall[j].picnum == SPACEDOORSWITCH ||
+                          wall[j].picnum == SPACEDOORSWITCH+1 ||
+                          wall[j].picnum == SPACELIGHTSWITCH ||
+                          wall[j].picnum == SPACELIGHTSWITCH+1 ||
+                          wall[j].picnum == FRANKENSTINESWITCH ||
+                          wall[j].picnum == FRANKENSTINESWITCH+1 ||
+                          wall[j].picnum == DIPSWITCH ||
+                          wall[j].picnum == DIPSWITCH+1 ||
+                          wall[j].picnum == DIPSWITCH2 ||
+                          wall[j].picnum == DIPSWITCH2+1 ||
+                          wall[j].picnum == DIPSWITCH3 ||
+                          wall[j].picnum == DIPSWITCH3+1 ||
+                          wall[j].picnum == LIGHTSWITCH2 ||
+                          wall[j].picnum == LIGHTSWITCH2+1 ||
+                          wall[j].picnum == POWERSWITCH1 ||
+                          wall[j].picnum == POWERSWITCH1+1 ||
+                          wall[j].picnum == LOCKSWITCH1 ||
+                          wall[j].picnum == LOCKSWITCH1+1 ||
+                          wall[j].picnum == POWERSWITCH2 ||
+                          wall[j].picnum == POWERSWITCH2+1 ||
+                          wall[j].picnum == HANDSWITCH ||
+                          wall[j].picnum == HANDSWITCH+1 ||
+                          wall[j].picnum == PULLSWITCH ||
+                          wall[j].picnum == PULLSWITCH+1 || 
+                          wall[j].picnum == TECHSWITCH ||
+                          wall[j].picnum == TECHSWITCH+1 ||
+                          wall[j].picnum == ALIENSWITCH ||
+                          wall[j].picnum == ALIENSWITCH+1 ||
+                          wall[j].picnum == DOORTILE5 ||
+                          wall[j].picnum == DOORTILE6 ||
+                          wall[j].picnum == DOORTILE1 ||
+                          wall[j].picnum == DOORTILE2 ||
+                          wall[j].picnum == DOORTILE3 ||
+                          wall[j].picnum == DOORTILE4 ||
+                          wall[j].picnum == DOORTILE7 ||
+                          wall[j].picnum == DOORTILE8 ||
+                          wall[j].picnum == DOORTILE9 ||
+                          wall[j].picnum == DOORTILE10 ||
+                          wall[j].picnum == DOORTILE22 ||
+                          wall[j].picnum == DOORTILE18 ||
+                          wall[j].picnum == DOORTILE19 ||
+                          wall[j].picnum == DOORTILE20 ||
+                          wall[j].picnum == DOORTILE14 ||
+                          wall[j].picnum == DOORTILE16 ||
+                          wall[j].picnum == DOORTILE15 ||
+                          wall[j].picnum == DOORTILE21 ||
+                          wall[j].picnum == DOORTILE17 ||
+                          wall[j].picnum == DOORTILE11 ||
+                          wall[j].picnum == DOORTILE12 ||
+                          wall[j].picnum == DOORTILE23)) ||
+                        ((SLT-wall[j].lotag >= 0 &&
+                          SLT-wall[j].lotag <= 3 &&
+                          (wall[j].picnum == MULTISWITCH ||
+                           wall[j].picnum == MULTISWITCH+1 ||
+                           wall[j].picnum == MULTISWITCH+2 ||
+                           wall[j].picnum == MULTISWITCH+3))))
+                    {
+                        //POGO: only count respawn sprites if their respective channel can be called by some trigger in the level
+                        ud.maxKills++;
+                        goto NEXTSPRITE;
+                    }
+                }
+            }
+        }
+        NEXTSPRITE:
+            continue;
+    }
+    //OSD_Printf("Player Skill: %lu\n", ud.player_skill);
+    //OSD_Printf("Max Kills: %lu\n", ud.maxKills);
 }
 
 
@@ -1038,6 +1226,7 @@ void newgame(char vn,char ln,char sk)
     if( ud.m_recstat != 2 && ud.last_level >= 0 && ud.multimode > 1 && ud.coop != 1)
         dobonus(1);
 
+    //POGOTODO: fix the screen going blank when noanim is enabled and certain cutscenes are supposed to play
     if( ln == 0 && vn == 3 && ud.multimode < 2 && ud.lockout == 0 && dnGetAddonId() == 0)
     {
         clearview(0L);
@@ -1088,6 +1277,7 @@ void newgame(char vn,char ln,char sk)
     ud.level_number =   ln;
     ud.volume_number =  vn;
     ud.player_skill =   sk;
+    ud.demoStartFromScratch = 1;
     ud.secretlevel =    0;
     ud.from_bonus = 0;
     parallaxyscale = 0;
@@ -1144,6 +1334,7 @@ void resetpspritevars(char g)
     EGS(ps[0].cursectnum,ps[0].posx,ps[0].posy,ps[0].posz,
         APLAYER,0,0,0,ps[0].ang,0,0,0,10);
 
+    //POGOTODO: do I need to change this for continuous demos?
     if(ud.recstat != 2) for(i=0;i<MAXPLAYERS;i++)
     {
         aimmode[i] = ps[i].aim_mode;
@@ -1171,7 +1362,10 @@ void resetpspritevars(char g)
         }
     }
 
+    ud.totaltime += ps[myconnectindex].player_par;
     resetplayerstats(0);
+    //POGO: reset real IL time
+    ud.realtime = 0;
 
     for(i=1;i<MAXPLAYERS;i++)
        memcpy(&ps[i],&ps[0],sizeof(ps[0]));
@@ -1421,17 +1615,18 @@ void dofrontscreens(const char *statustext)
 {
     extern int megatondef;
     long i=0;
-    if(ud.recstat != 2)
+
+    if (ud.recstat != 2 || ps[myconnectindex].gm & MODE_EOL)
     {
-	if (!statustext) {
-		//ps[myconnectindex].palette = palette;
-		setgamepalette(&ps[myconnectindex], palette, 1);	// JBF 20040308
-		fadepal(0,0,0, 0,64,7);
-		i = ud.screen_size;
-		ud.screen_size = 0;
-		vscrn();
-		clearview(0L);
-	}
+	    if (!statustext) {
+		    //ps[myconnectindex].palette = palette;
+		    setgamepalette(&ps[myconnectindex], palette, 1);	// JBF 20040308
+		    fadepal(0,0,0, 0,64,7);
+		    i = ud.screen_size;
+		    ud.screen_size = 0;
+		    vscrn();
+		    clearview(0L);
+	    }
 
         if (megatondef) {
             rotatesprite(320<<15,200<<15,65536L,0,LOADSCREEN_MEGATON,0,0,2+8+64,0,0,xdim-1,ydim-1);
@@ -1444,40 +1639,38 @@ void dofrontscreens(const char *statustext)
         {
             menutext(160,90,0,0,"ENTERING USER MAP");
             gametextpal(160,90+10,boardfilename,14,2);
-        }
-        else
+        } else
         {
             menutext(160,90,0,0,"ENTERING");
             menutext(160,90+16+8,0,0,level_names[(ud.volume_number*11) + ud.level_number]);
         }
 
-	if (statustext) gametext(160,180,statustext,0,2+8+16);
+	    if (statustext) gametext(160,180,statustext,0,2+8+16);
 
-        nextpage();
+            nextpage();
 
-	if (!statustext) {
-		fadepal(0,0,0, 63,0,-7);
+	    if (!statustext) {
+		    fadepal(0,0,0, 63,0,-7);
 
-        	KB_FlushKeyboardQueue();
-        	ud.screen_size = i;
-	}
-    }
-    else
+        	    KB_FlushKeyboardQueue();
+        	    ud.screen_size = i;
+	    }
+    } else
     {
-	if (!statustext) {
-        	clearview(0L);
-        	//ps[myconnectindex].palette = palette;
-		//palto(0,0,0,0);
-		setgamepalette(&ps[myconnectindex], palette, 0);	// JBF 20040308
-	}
+	    if (!statustext) {
+        	    clearview(0L);
+        	    //ps[myconnectindex].palette = palette;
+		    //palto(0,0,0,0);
+		    setgamepalette(&ps[myconnectindex], palette, 0);	// JBF 20040308
+	    }
         if (megatondef) {
             rotatesprite(320<<15,200<<15,65536L,0,LOADSCREEN_MEGATON,0,0,2+8+64,0,0,xdim-1,ydim-1);
         } else {
             rotatesprite(320<<15,200<<15,65536L,0,LOADSCREEN,0,0,2+8+64,0,0,xdim-1,ydim-1);
         }
         menutext(160,105,0,0,"LOADING...");
-	if (statustext) gametext(160,180,statustext,0,2+8+16);
-        nextpage();
+	    if (statustext) gametext(160,180,statustext,0,2+8+16);
+            nextpage();
     }
 }
 
@@ -1575,6 +1768,14 @@ int enterlevel(char g)
     long l;
     char levname[BMAX_PATH];
 
+    //POGO: update what speedrun categories have been met
+    ud.speedrunCategoriesMet &= 0xF8 |
+                                (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) |
+                                (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                                 ps[myconnectindex].actors_killed == ps[myconnectindex].max_actors_killed) << 1 |
+                                (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                                 ps[myconnectindex].actors_killed == ud.maxKills) << 2;
+
     if( (g&MODE_DEMO) != MODE_DEMO ) ud.recstat = ud.m_recstat;
     ud.respawn_monsters = ud.m_respawn_monsters;
     ud.respawn_items    = ud.m_respawn_items;
@@ -1661,17 +1862,22 @@ if (!VOLUMEONE) {
     cachedebug = 0;
     automapping = 0;
 
-    if(ud.recstat != 2) stopmusic();
+    if (ud.recstat != 2 ||
+        ud.demoPlayerMode)
+    {
+        stopmusic();
+    }
 
     cacheit();
 
-    if(ud.recstat != 2)
+    if(ud.recstat != 2 ||
+       ud.demoPlayerMode)
     {
         music_select = (ud.volume_number*11) + ud.level_number;
         playmusic(&music_fn[0][music_select][0]);
     }
 
-    if( (g&MODE_GAME) || (g&MODE_EOL) )
+    if(!(g&MODE_DEMO) && ((g&MODE_GAME) || (g&MODE_EOL)))
         ps[myconnectindex].gm = MODE_GAME;
     else if(g&MODE_RESTART)
     {
@@ -1680,8 +1886,16 @@ if (!VOLUMEONE) {
         else ps[myconnectindex].gm = MODE_GAME;
     }
 
-    if( (ud.recstat == 1) && (g&MODE_RESTART) != MODE_RESTART )
-        opendemowrite();
+    if ((ud.recstat == 1 && (g&MODE_RESTART) != MODE_RESTART) || ud.recstat == 3)
+    {
+        if (ud.recstat == 1 || ud.reccnt == 0)
+        {
+            opendemowrite();
+        } else
+        {
+            demowritenewboard();
+        }
+    }
 
 if (VOLUMEONE) {
     if(ud.level_number == 0 && ud.recstat != 2) FTA(40,&ps[myconnectindex]);
@@ -1739,6 +1953,7 @@ if (VOLUMEONE) {
 
      clearfrags();
 
+     ud.lastclock = getticks();
      resettimevars();  // Here we go
 
 	return 0;

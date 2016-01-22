@@ -28,6 +28,7 @@ void GUI_ShowSoundMenu(void);
 void GUI_ShowVideoSettingsMenu(void);
 void GUI_ShowGameOptionsMenu(void);
 void GUI_ShowQuitConfirmation(void);
+void GUI_ShowBackground(char visible);
 
 #ifdef __cplusplus
 }

@@ -411,16 +411,25 @@ void CONFIG_ReadKeys( void )
                dnBindFunction(function, 1, key2);
                KeyboardKeys[function][0] = -1;
                KeyboardKeys[function][1] = -1;
+
+               if (function == gamefunc_Show_Console)
+               {
+                   KeyboardKeys[function][0] = dnTranslateSDLKey(key1);
+                   KeyboardKeys[function][1] = dnTranslateSDLKey(key2);
+
+                   OSD_CaptureKey(KeyboardKeys[function][0], false);
+                   OSD_CaptureKey(KeyboardKeys[function][1], true);
+               }
            }
        }
        
-       for (i=0; i<NUMGAMEFUNCTIONS; i++)
+       /*for (i=0; i<NUMGAMEFUNCTIONS; i++)
        {
            if (i == gamefunc_Show_Console)
                OSD_CaptureKey(KeyboardKeys[i][0]);
            else
                CONTROL_MapKey( i, KeyboardKeys[i][0], KeyboardKeys[i][1] );
-       }
+       }*/
 
 #endif
    }
@@ -913,7 +922,6 @@ void CONFIG_WriteSetup( void )
 	SCRIPT_Free (scripthandle);
 }
 
-
 int32 CONFIG_GetMapBestTime(char *mapname)
 {
 	int32 t = -1;
@@ -932,6 +940,7 @@ int32 CONFIG_GetMapBestTime(char *mapname)
 	return t;
 }
 
+//POGOTODO: ensure map best times are saved to disc
 int32 CONFIG_SetMapBestTime(char *mapname, int32 tm)
 {
 	char m[BMAX_PATH], *p;

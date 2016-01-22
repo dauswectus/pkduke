@@ -176,37 +176,40 @@ title {
     <div id="MedKit" key-chooser>MedKit</div>
 
 <!--    <div id="TurnAround" key-chooser>Turn Around</div> -->
-<!--    <div id="SendMessage" key-chooser>Send Message</div> -->
+    <div id="SendMessage" key-chooser>Send Message</div>
 
     <div id="Map" key-chooser>Map</div>
     <div id="Shrink_Screen" key-chooser>Map Zoom Out</div>
     <div id="Enlarge_Screen" key-chooser>Map Zoom In</div>
-
-<!--
-    <div id="Shrink_Screen" key-chooser>Shrink_Screen</div>
-    <div id="Enlarge_Screen" key-chooser>Enlarge_Screen</div>
--->
+    <div id="Map_Follow_Mode" key-chooser>Map Follow Mode</div>
 
     <div id="Center_View" key-chooser>Center View</div>
+    <div id="Mouse_Aiming" key-chooser>Toggle Mouse Aim</div>
 
-<!--
-    <div id="Holster_Weapon" key-chooser>Holster_Weapon</div>
-    <div id="Show_Opponents_Weapon" key-chooser>Show_Opponents_Weapon</div>
-    <div id="Map_Follow_Mode" key-chooser>Map_Follow_Mode</div>
-    <div id="See_Coop_View" key-chooser>See_Coop_View</div>
-    <div id="Mouse_Aiming" key-chooser>Mouse_Aiming</div>
-    <div id="Toggle_Crosshair" key-chooser>Toggle_Crosshair</div>
--->
+
+<!--<div id="Holster_Weapon" key-chooser>Holster_Weapon</div>-->
+    <div id="See_Coop_View" key-chooser>See Coop View</div>
+    <div id="Toggle_Crosshair" key-chooser>Toggle Crosshair</div>
+    <div id="Show_Opponents_Weapon" key-chooser>Show Opponents Weapon</div>
 
     <div id="Steroids" key-chooser>Steroids</div>
     <div id="Quick_Kick" key-chooser>Quick Kick</div>
     <div id="Next_Weapon" key-chooser>Next Weapon</div>
     <div id="Previous_Weapon" key-chooser>Previous Weapon</div>
 
-    <div id="Quick_Load" key-chooser>Quick Load</div>
+    <div id="Help_Menu" key-chooser>Help Screen</div>
+    <div id="Save_Menu" key-chooser>Save Menu</div>
+    <div id="Load_Menu" key-chooser>Load Menu</div>
+    <div id="Sound_Menu" key-chooser>Sound Options</div>
+    <div id="Next_Track" key-chooser>Next Track</div>
     <div id="Quick_Save" key-chooser>Quick Save</div>
+    <div id="View_Mode" key-chooser>3rd Person View</div>
+    <div id="Game_Menu" key-chooser>Game Options</div>
+    <div id="Quick_Load" key-chooser>Quick Load</div>
+    <div id="Quit_Game" key-chooser>Quit Game</div>
+    <div id="Video_Menu" key-chooser>Video Settings</div>
 
-<!--    <div id="Show_Console" key-chooser>Show_Console</div>-->
+    <div id="Show_Console" key-chooser>Show_Console</div>
 </div>
 
 </div>

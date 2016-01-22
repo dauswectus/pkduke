@@ -1399,8 +1399,10 @@ void displayweapon(short snum)
     gs = sprite[p->i].shade;
     if(gs > 24) gs = 24;
 
-    if(p->newowner >= 0 || ud.camerasprite >= 0 || p->over_shoulder_on > 0 || (sprite[p->i].pal != 1 && sprite[p->i].extra <= 0) || animatefist(gs,snum) || animateknuckles(gs,snum) || animatetip(gs,snum) || animateaccess(gs,snum) )
+    if (p->newowner >= 0 || ud.camerasprite >= 0 || p->over_shoulder_on > 0 || (sprite[p->i].pal != 1 && sprite[p->i].extra <= 0) || animatefist(gs, snum) || animateknuckles(gs, snum) || animatetip(gs, snum) || animateaccess(gs, snum))
+    {
         return;
+    }
 
     animateknee(gs,snum);
 
@@ -2542,7 +2544,7 @@ void processinput(short snum)
 	
 	if(p->loogcnt > 0) p->loogcnt--;
 	else p->loogcnt = 0;
-	
+
 	if(p->pals_time >= 0)	// JBF 20040101: was > 0
 		p->pals_time--;
 	

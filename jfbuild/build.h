@@ -469,6 +469,11 @@ void    setrollangle(long rolla);
 //       clamping is for sprites, repeating is for walls
 void invalidatetile(short tilenume, long pal, long how);
 
+#ifdef _DEBUG
+extern long db_reccnt;
+void debugSetReccnt(long reccnt);
+#endif
+
 void setpolymost2dview(void);   // sets up GL for 2D drawing
 
 long polymost_drawtilescreen(long tilex, long tiley, long wallnum, long dimen);

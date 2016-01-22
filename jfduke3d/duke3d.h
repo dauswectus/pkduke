@@ -67,6 +67,7 @@ extern int conversion,shareware,gametype;
 #define BYTEVERSION_15	117
 #define BYTEVERSION_JF	129	// increase by 3, because atomic GRP adds 1, and Shareware adds 2
 
+//POGOTODO: provide own byte versions, and especially track various add-on packs with different byte versions too!
 #define BYTEVERSION (BYTEVERSION_JF+(PLUTOPAK?1:(VOLUMEONE<<1)))	// JBF 20040116: different data files give different versions
 
 #define NUMPAGES 1
@@ -303,7 +304,7 @@ struct user_defs
     char pwlockout[128],rtsname[128];
     char overhead_on,last_overhead,showweapons;
 
-    char disableCameras;
+    char disableCameras, demoPlayerMode, demoStartFromScratch;
 
     short pause_on,from_bonus;
     short camerasprite,last_camsprite;
@@ -319,6 +320,7 @@ struct user_defs
     int32 coords,tickrate,levelstats,m_coop,coop,screen_size,lockout,crosshair;
     int32 wchoice[MAXPLAYERS][MAX_WEAPONS],playerai;
 
+    //recstat == (0: default, 1: recording IL demo, 2: demo playback, 3: recording continuous demo, 4: main menu intermission between playing back demos)
     int32 respawn_monsters,respawn_items,respawn_inventory,recstat,monsters_off,brightness;
     int32 m_respawn_items,m_respawn_monsters,m_respawn_inventory,m_recstat,m_monsters_off,detail;
     int32 m_ffire,ffire,m_player_skill,m_level_number,m_volume_number,multimode;
@@ -329,6 +331,16 @@ struct user_defs
     int32 fraglimit; /* 0 if not set */
     int32 timelimit; /* measured in seconds, 0 if not set */
     unsigned long matchtime;
+
+    unsigned long totaltime, realtime, realtotaltime;
+    unsigned long totaltimestore, realtotaltimestore;
+
+    unsigned long lastclock;
+
+    unsigned long maxKills;
+    unsigned char speedrunCategoriesMet;
+
+    unsigned char startedepisode;
 };
     
 struct lobby_filters {
@@ -536,6 +548,7 @@ extern long myhorizbak[MOVEFIFOSIZ];
 extern short myangbak[MOVEFIFOSIZ];
 
 extern short weaponsandammosprites[15];
+extern const short SPAWNABLE_ENEMY_PIC_NUMS[38];
 
 
 //DUKE3D.H:
