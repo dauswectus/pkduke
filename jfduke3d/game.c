@@ -56,7 +56,7 @@ Modifications for JonoF's port by Jonathon Fowler(jf@jonof.id.au)
 
 #include "_control.h"
 
-#define VERSION "pkDuke 1.0"
+#define VERSION "pkDuke 1.0 (Megaton 1.3.2)"
 
 #define HEAD   "Duke Nukem 3D Unregistered Shareware "VERSION
 
@@ -9079,11 +9079,13 @@ void opendemoverificationread(void)
 
 void closedemoverification(void)
 {
+#ifdef _DEBUG
     if (demoverificationfilep != 0)
     {
         fclose(demoverificationfilep);
         demoverificationfilep = 0;
     }
+#endif
 }
 
 //POGOTODO: clean-up these demo verification functions
@@ -9136,198 +9138,18 @@ void recorddemoverification(void)
 
     fwrite(&randomseed, sizeof(randomseed), 1, demoverificationfilep);
     fwrite(&global_random, sizeof(global_random), 1, demoverificationfilep);
-
-    /* else if (ud.reccnt % 100 != 0)
-    {
-        return;
-    }
-
-    long i, j;
-    char scriptptrs[MAXSCRIPTSIZE];
-
-    fwrite(&numwalls, 2, 1, demoverificationfilep);
-    fwrite(&wall[0], sizeof(walltype), MAXWALLS, demoverificationfilep);
-    fwrite(&numsectors, 2, 1, demoverificationfilep);
-    fwrite(&sector[0], sizeof(sectortype), MAXSECTORS, demoverificationfilep);
-    fwrite(&sprite[0], sizeof(spritetype), MAXSPRITES, demoverificationfilep);
-    fwrite(&spriteext[0], sizeof(spriteexttype), MAXSPRITES, demoverificationfilep);
-    fwrite(&headspritesect[0], 2, MAXSECTORS + 1, demoverificationfilep);
-    fwrite(&prevspritesect[0], 2, MAXSPRITES, demoverificationfilep);
-    fwrite(&nextspritesect[0], 2, MAXSPRITES, demoverificationfilep);
-    fwrite(&headspritestat[0], 2, MAXSTATUS + 1, demoverificationfilep);
-    fwrite(&prevspritestat[0], 2, MAXSPRITES, demoverificationfilep);
-    fwrite(&nextspritestat[0], 2, MAXSPRITES, demoverificationfilep);
-    fwrite(&numcyclers, sizeof(numcyclers), 1, demoverificationfilep);
-    fwrite(&cyclers[0][0], 12, MAXCYCLERS, demoverificationfilep);
-    fwrite(ps, sizeof(ps), 1, demoverificationfilep);
-    fwrite(po, sizeof(po), 1, demoverificationfilep);
-    fwrite(&numanimwalls, sizeof(numanimwalls), 1, demoverificationfilep);
-    fwrite(&animwall, sizeof(animwall), 1, demoverificationfilep);
-    fwrite(&msx[0], sizeof(long), sizeof(msx) / sizeof(long), demoverificationfilep);
-    fwrite(&msy[0], sizeof(long), sizeof(msy) / sizeof(long), demoverificationfilep);
-    fwrite(&spriteqloc, sizeof(short), 1, demoverificationfilep);
-    fwrite(&spriteqamount, sizeof(short), 1, demoverificationfilep);
-    fwrite(&spriteq[0], sizeof(short), spriteqamount, demoverificationfilep);
-    fwrite(&mirrorcnt, sizeof(short), 1, demoverificationfilep);
-    fwrite(&mirrorwall[0], sizeof(short), 64, demoverificationfilep);
-    fwrite(&mirrorsector[0], sizeof(short), 64, demoverificationfilep);
-    fwrite(&show2dsector[0], sizeof(char), MAXSECTORS >> 3, demoverificationfilep);
-    fwrite(&actortype[0], sizeof(char), MAXTILES - VIRTUALTILES, demoverificationfilep);
-
-    fwrite(&numclouds, sizeof(numclouds), 1, demoverificationfilep);
-    fwrite(&clouds[0], sizeof(short) << 7, 1, demoverificationfilep);
-    fwrite(&cloudx[0], sizeof(short) << 7, 1, demoverificationfilep);
-    fwrite(&cloudy[0], sizeof(short) << 7, 1, demoverificationfilep);
-
-    for (i = 0; i<MAXSCRIPTSIZE; i++)
-    {
-        if ((long)script[i] >= (long)(&script[0]) && (long)script[i] < (long)(&script[MAXSCRIPTSIZE]))
-        {
-            scriptptrs[i] = 1;
-            j = (long)script[i] - (long)&script[0];
-            script[i] = j;
-        }
-        else scriptptrs[i] = 0;
-    }
-
-    fwrite(&scriptptrs[0], 1, MAXSCRIPTSIZE, demoverificationfilep);
-    fwrite(&script[0], 4, MAXSCRIPTSIZE, demoverificationfilep);
-
-    for (i = 0; i<MAXSCRIPTSIZE; i++)
-        if (scriptptrs[i])
-        {
-        j = script[i] + (long)&script[0];
-        script[i] = j;
-        }
-
-    for (i = 0; i<MAXTILES - VIRTUALTILES; i++)
-        if (actorscrptr[i])
-        {
-        j = (long)actorscrptr[i] - (long)&script[0];
-        actorscrptr[i] = (long *)j;
-        }
-    fwrite(&actorscrptr[0], 4, MAXTILES - VIRTUALTILES, demoverificationfilep);
-    for (i = 0; i<MAXTILES - VIRTUALTILES; i++)
-        if (actorscrptr[i])
-        {
-        j = (long)actorscrptr[i] + (long)&script[0];
-        actorscrptr[i] = (long *)j;
-        }
-
-    for (i = 0; i<MAXSPRITES; i++)
-    {
-        scriptptrs[i] = 0;
-
-        if (actorscrptr[PN] == 0) continue;
-
-        j = (long)&script[0];
-
-        if (T2 >= j && T2 < (long)(&script[MAXSCRIPTSIZE]))
-        {
-            scriptptrs[i] |= 1;
-            T2 -= j;
-        }
-        if (T5 >= j && T5 < (long)(&script[MAXSCRIPTSIZE]))
-        {
-            scriptptrs[i] |= 2;
-            T5 -= j;
-        }
-        if (T6 >= j && T6 < (long)(&script[MAXSCRIPTSIZE]))
-        {
-            scriptptrs[i] |= 4;
-            T6 -= j;
-        }
-    }
-
-    fwrite(&scriptptrs[0], 1, MAXSPRITES, demoverificationfilep);
-    fwrite(&hittype[0], sizeof(struct weaponhit), MAXSPRITES, demoverificationfilep);
-
-    for (i = 0; i<MAXSPRITES; i++)
-    {
-        if (actorscrptr[PN] == 0) continue;
-        j = (long)&script[0];
-
-        if (scriptptrs[i] & 1)
-            T2 += j;
-        if (scriptptrs[i] & 2)
-            T5 += j;
-        if (scriptptrs[i] & 4)
-            T6 += j;
-    }
-
-    fwrite(&lockclock, sizeof(lockclock), 1, demoverificationfilep);
-    fwrite(&pskybits, sizeof(pskybits), 1, demoverificationfilep);
-    fwrite(&pskyoff[0], sizeof(pskyoff[0]), MAXPSKYTILES, demoverificationfilep);
-    fwrite(&animatecnt, sizeof(animatecnt), 1, demoverificationfilep);
-    fwrite(&animatesect[0], 2, MAXANIMATES, demoverificationfilep);
-    for (i = animatecnt - 1; i >= 0; i--) animateptr[i] = (long *)((long)animateptr[i] - (long)(&sector[0]));
-    fwrite(&animateptr[0], 4, MAXANIMATES, demoverificationfilep);
-    for (i = animatecnt - 1; i >= 0; i--) animateptr[i] = (long *)((long)animateptr[i] + (long)(&sector[0]));
-    fwrite(&animategoal[0], 4, MAXANIMATES, demoverificationfilep);
-    fwrite(&animatevel[0], 4, MAXANIMATES, demoverificationfilep);
-
-    fwrite(&earthquaketime, sizeof(earthquaketime), 1, demoverificationfilep);
-    fwrite(&ud.from_bonus, sizeof(ud.from_bonus), 1, demoverificationfilep);
-    fwrite(&ud.secretlevel, sizeof(ud.secretlevel), 1, demoverificationfilep);
-    fwrite(&ud.god, sizeof(ud.god), 1, demoverificationfilep);
-    fwrite(&ud.auto_run, sizeof(ud.auto_run), 1, demoverificationfilep);
-    fwrite(&ud.last_level, sizeof(ud.last_level), 1, demoverificationfilep);
-    fwrite(&ud.eog, sizeof(ud.eog), 1, demoverificationfilep);
-    fwrite(&camsprite, sizeof(camsprite), 1, demoverificationfilep);
-    fwrite(&connecthead, sizeof(connecthead), 1, demoverificationfilep);
-    fwrite(connectpoint2, sizeof(connectpoint2), 1, demoverificationfilep);
-    fwrite(&numplayersprites, sizeof(numplayersprites), 1, demoverificationfilep);
-    fwrite((short *)&frags[0][0], sizeof(frags), 1, demoverificationfilep);
-
-    fwrite(&randomseed, sizeof(randomseed), 1, demoverificationfilep);
-    fwrite(&global_random, sizeof(global_random), 1, demoverificationfilep);
-    fwrite(&parallaxyscale, sizeof(parallaxyscale), 1, demoverificationfilep);*/
 #endif
 }
 
 #ifdef _DEBUG
-/*short dv_numsectors, dv_numwalls;
-sectortype dv_sector[MAXSECTORS];
-walltype dv_wall[MAXWALLS];
-spritetype dv_sprite[MAXSPRITES];
-spriteexttype dv_spriteext[MAXSPRITES + MAXUNIQHUDID];
-short dv_headspritesect[MAXSECTORS + 1], dv_headspritestat[MAXSTATUS + 1];
-short dv_prevspritesect[MAXSPRITES], dv_prevspritestat[MAXSPRITES];
-short dv_nextspritesect[MAXSPRITES], dv_nextspritestat[MAXSPRITES];
-short dv_cyclers[MAXCYCLERS][6], dv_numcyclers;
-struct player_orig dv_po[MAXPLAYERS];
-short dv_numanimwalls;
-struct animwalltype dv_animwall[MAXANIMWALLS];
-long dv_msx[2048], dv_msy[2048];
-short dv_spriteq[1024], dv_spriteqloc, dv_spriteqamount = 64;
-short dv_mirrorwall[64], dv_mirrorsector[64], dv_mirrorcnt;
-char dv_show2dsector[(MAXSECTORS + 7) >> 3];
-char dv_actortype[MAXTILES];
-short dv_numclouds, dv_clouds[128], dv_cloudx[128], dv_cloudy[128];
-long dv_script[MAXSCRIPTSIZE + 16];
-long *dv_actorscrptr[MAXTILES];
-struct weaponhit dv_hittype[MAXSPRITES];
-long dv_lockclock;
-short dv_pskyoff[MAXPSKYTILES], dv_pskybits;
-short dv_animatesect[MAXANIMATES];
-long *dv_animateptr[MAXANIMATES], dv_animategoal[MAXANIMATES], dv_animatevel[MAXANIMATES], dv_animatecnt;
-char dv_numplayersprites, dv_earthquaketime;
-short dv_ud_from_bonus;
-short dv_ud_last_level, dv_ud_secretlevel;
-char dv_ud_god;
-int32 dv_ud_auto_run;
-char dv_ud_eog;
-short dv_camsprite;
-long dv_connecthead, dv_connectpoint2[MAXPLAYERS];
-short dv_frags[MAXPLAYERS][MAXPLAYERS];*/
 struct player_struct dv_ps[MAXPLAYERS];
 long dv_randomseed;
 short int dv_global_random;
-//long dv_parallaxyscale;
 #endif
 
 void verifydemoframe(void)
 {
+#ifdef _DEBUG
     if (demoverificationfilep == 0)
     {
         return;
@@ -9418,179 +9240,7 @@ void verifydemoframe(void)
         OSD_Printf("Demo frame verification failed: global_random different! %hu vs %hu\n", global_random, dv_global_random);
         //global_random = dv_global_random;
     }
-
-    /* else if (ud.reccnt % 100 != 0)
-    {
-        return;
-    }
-
-#ifdef _DEBUG
-    short k;
-    char scriptptrs[MAXSCRIPTSIZE];
-    long i, j, x;
-
-    if (fread(&dv_numwalls, 2, 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_numwalls, &numwalls, sizeof(dv_numwalls))) faildemoframeverification("difference in numwalls");
-
-    if (fread(&dv_wall[0], sizeof(walltype), MAXWALLS, demoverificationfilep) != MAXWALLS) goto corrupt;
-    if (memcmp(&dv_wall[0], &wall[0], sizeof(dv_wall))) faildemoframeverification("difference in wall[]");
-    if (fread(&dv_numsectors, 2, 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_numsectors, &numsectors, sizeof(dv_numsectors))) faildemoframeverification("difference in numsectors");
-    if (fread(&dv_sector[0], sizeof(sectortype), MAXSECTORS, demoverificationfilep) != MAXSECTORS) goto corrupt;
-    if (memcmp(&dv_sector[0], &sector[0], sizeof(dv_sector))) faildemoframeverification("difference in sector[]");
-    if (fread(&dv_sprite[0], sizeof(spritetype), MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
-    if (memcmp(&dv_sprite[0], &sprite[0], sizeof(dv_sprite))) faildemoframeverification("difference in sprite[]");
-    if (fread(&dv_spriteext[0], sizeof(spriteexttype), MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
-    if (memcmp(&dv_spriteext[0], &spriteext[0], sizeof(dv_spriteext))) faildemoframeverification("difference in spriteext[]");
-    if (fread(&dv_headspritesect[0], 2, MAXSECTORS + 1, demoverificationfilep) != MAXSECTORS + 1) goto corrupt;
-    if (memcmp(&dv_headspritesect[0], &headspritesect[0], sizeof(dv_headspritesect))) faildemoframeverification("difference in headspritesect[]");
-    if (fread(&dv_prevspritesect[0], 2, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
-    if (memcmp(&dv_prevspritesect[0], &prevspritesect[0], sizeof(dv_prevspritesect))) faildemoframeverification("difference in prevspritesect[]");
-    if (fread(&dv_nextspritesect[0], 2, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
-    if (memcmp(&dv_nextspritesect[0], &nextspritesect[0], sizeof(dv_nextspritesect))) faildemoframeverification("difference in nextspritesect[]");
-    if (fread(&dv_headspritestat[0], 2, MAXSTATUS + 1, demoverificationfilep) != MAXSTATUS + 1) goto corrupt;
-    if (memcmp(&dv_headspritestat[0], &headspritestat[0], sizeof(dv_headspritestat))) faildemoframeverification("difference in headspritestat[]");
-    if (fread(&dv_prevspritestat[0], 2, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
-    if (memcmp(&dv_prevspritestat[0], &prevspritestat[0], sizeof(dv_prevspritestat))) faildemoframeverification("difference in prevspritestat[]");
-    if (fread(&dv_nextspritestat[0], 2, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
-    if (memcmp(&dv_nextspritestat[0], &nextspritestat[0], sizeof(dv_nextspritestat))) faildemoframeverification("difference in nextspritestat[]");
-    if (fread(&dv_numcyclers, sizeof(dv_numcyclers), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_numcyclers, &numcyclers, sizeof(dv_numcyclers))) faildemoframeverification("difference in numcyclers");
-    if (fread(&dv_cyclers[0][0], 12, MAXCYCLERS, demoverificationfilep) != MAXCYCLERS) goto corrupt;
-    if (memcmp(&dv_cyclers[0][0], &cyclers[0][0], sizeof(dv_cyclers))) faildemoframeverification("difference in cyclers[][]");
-    if (fread(dv_ps, sizeof(dv_ps), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_ps, &ps, sizeof(dv_ps))) faildemoframeverification("difference in ps");
-    if (fread(dv_po, sizeof(dv_po), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_po, &po, sizeof(dv_po))) faildemoframeverification("difference in po");
-    if (fread(&dv_numanimwalls, sizeof(dv_numanimwalls), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_numanimwalls, &numanimwalls, sizeof(dv_numanimwalls))) faildemoframeverification("difference in numanimwalls");
-    if (fread(&dv_animwall, sizeof(dv_animwall), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_animwall, &animwall, sizeof(dv_animwall))) faildemoframeverification("difference in animwall");
-    if (fread(&dv_msx[0], sizeof(long), sizeof(dv_msx) / sizeof(long), demoverificationfilep) != sizeof(dv_msx) / sizeof(long)) goto corrupt;
-    if (memcmp(&dv_msx[0], &msx[0], sizeof(dv_msx))) faildemoframeverification("difference in msx[]");
-    if (fread(&dv_msy[0], sizeof(long), sizeof(dv_msy) / sizeof(long), demoverificationfilep) != sizeof(dv_msy) / sizeof(long)) goto corrupt;
-    if (memcmp(&dv_msy[0], &msy[0], sizeof(dv_msy))) faildemoframeverification("difference in msy[]");
-    if (fread((short *)&dv_spriteqloc, sizeof(short), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_spriteqloc, &spriteqloc, sizeof(dv_spriteqloc))) faildemoframeverification("difference in spriteqloc");
-    if (fread((short *)&dv_spriteqamount, sizeof(short), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_spriteqamount, &spriteqamount, sizeof(dv_spriteqamount))) faildemoframeverification("difference in spriteqamount");
-    if (fread((short *)&dv_spriteq[0], sizeof(short), spriteqamount, demoverificationfilep) != spriteqamount) goto corrupt;
-    if (memcmp(&dv_spriteq[0], &spriteq[0], sizeof(dv_spriteq))) faildemoframeverification("difference in spriteq[]");
-    if (fread(&dv_mirrorcnt, sizeof(short), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_mirrorcnt, &mirrorcnt, sizeof(dv_mirrorcnt))) faildemoframeverification("difference in mirrorcnt");
-    if (fread(&dv_mirrorwall[0], sizeof(short), 64, demoverificationfilep) != 64) goto corrupt;
-    if (memcmp(&dv_mirrorwall[0], &mirrorwall[0], sizeof(dv_mirrorwall))) faildemoframeverification("difference in mirrorwall[]");
-    if (fread(&dv_mirrorsector[0], sizeof(short), 64, demoverificationfilep) != 64) goto corrupt;
-    if (memcmp(&dv_mirrorsector[0], &mirrorsector[0], sizeof(dv_mirrorsector))) faildemoframeverification("difference in mirrorsector[]");
-    if (fread(&dv_show2dsector[0], sizeof(char), MAXSECTORS >> 3, demoverificationfilep) != (MAXSECTORS >> 3)) goto corrupt;
-    if (memcmp(&dv_show2dsector[0], &show2dsector[0], sizeof(dv_show2dsector))) faildemoframeverification("difference in show2dsector[]");
-    if (fread(&dv_actortype[0], sizeof(char), MAXTILES - VIRTUALTILES, demoverificationfilep) != MAXTILES - VIRTUALTILES) goto corrupt;
-    if (memcmp(&dv_actortype[0], &actortype[0], sizeof(dv_actortype))) faildemoframeverification("difference in actortype[]");
-
-    if (fread(&dv_numclouds, sizeof(dv_numclouds), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_numclouds, &numclouds, sizeof(dv_numclouds))) faildemoframeverification("difference in numclouds");
-    if (fread(&dv_clouds[0], sizeof(short) << 7, 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_clouds[0], &clouds[0], sizeof(dv_clouds))) faildemoframeverification("difference in clouds[]");
-    if (fread(&dv_cloudx[0], sizeof(short) << 7, 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_cloudx[0], &cloudx[0], sizeof(dv_cloudx))) faildemoframeverification("difference in cloudx[]");
-    if (fread(&dv_cloudy[0], sizeof(short) << 7, 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_cloudy[0], &cloudy[0], sizeof(dv_cloudy))) faildemoframeverification("difference in cloudy[]");
-
-    if (fread(&scriptptrs[0], 1, MAXSCRIPTSIZE, demoverificationfilep) != MAXSCRIPTSIZE) goto corrupt;
-    if (fread(&dv_script[0], 4, MAXSCRIPTSIZE, demoverificationfilep) != MAXSCRIPTSIZE) goto corrupt;
-    for (i = 0; i < MAXSCRIPTSIZE; i++)
-    {
-        if (scriptptrs[i])
-        {
-            j = (long)dv_script[i] + (long)&dv_script[0];
-            dv_script[i] = j;
-        }
-    }
-
-    if (fread(&dv_actorscrptr[0], 4, MAXTILES - VIRTUALTILES, demoverificationfilep) != MAXTILES - VIRTUALTILES) goto corrupt;
-    for (i = 0; i < MAXTILES - VIRTUALTILES; i++)
-    {
-        if (dv_actorscrptr[i])
-        {
-            j = (long)dv_actorscrptr[i] + (long)&dv_script[0];
-            dv_actorscrptr[i] = (long *)j;
-        }
-    }
-
-    if (fread(&scriptptrs[0], 1, MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
-    if (fread(&dv_hittype[0], sizeof(struct weaponhit), MAXSPRITES, demoverificationfilep) != MAXSPRITES) goto corrupt;
-    if (memcmp(&dv_hittype[0], &hittype[0], sizeof(dv_hittype))) faildemoframeverification("difference in hittype[]");
-
-    for (i = 0; i<MAXSPRITES; i++)
-    {
-        j = (long)(&dv_script[0]);
-        if (scriptptrs[i] & 1) T2 += j;
-        if (scriptptrs[i] & 2) T5 += j;
-        if (scriptptrs[i] & 4) T6 += j;
-    }
-
-    if (memcmp(&dv_script[0], &script[0], sizeof(dv_script))) faildemoframeverification("difference in script[]");
-    if (memcmp(&dv_actorscrptr[0], &actorscrptr[0], sizeof(dv_actorscrptr))) faildemoframeverification("difference in actorscrptr[]");
-
-    if (fread(&dv_lockclock, sizeof(dv_lockclock), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_lockclock, &lockclock, sizeof(dv_lockclock))) faildemoframeverification("difference in lockclock");
-    if (fread(&dv_pskybits, sizeof(dv_pskybits), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_pskybits, &pskybits, sizeof(dv_pskybits))) faildemoframeverification("difference in pskybits");
-    if (fread(&dv_pskyoff[0], sizeof(dv_pskyoff[0]), MAXPSKYTILES, demoverificationfilep) != MAXPSKYTILES) goto corrupt;
-    if (memcmp(&dv_pskyoff[0], &pskyoff[0], sizeof(dv_pskyoff))) faildemoframeverification("difference in pskyoff[]");
-
-    if (fread(&dv_animatecnt, sizeof(dv_animatecnt), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_animatecnt, &animatecnt, sizeof(dv_animatecnt))) faildemoframeverification("difference in animatecnt");
-    if (fread(&dv_animatesect[0], 2, MAXANIMATES, demoverificationfilep) != MAXANIMATES) goto corrupt;
-    if (memcmp(&dv_animatesect[0], &animatesect[0], sizeof(dv_animatesect))) faildemoframeverification("difference in animatesect[]");
-    if (fread(&dv_animateptr[0], 4, MAXANIMATES, demoverificationfilep) != MAXANIMATES) goto corrupt;
-    for (i = dv_animatecnt - 1; i >= 0; i--) dv_animateptr[i] = (long *)((long)dv_animateptr[i] + (long)(&dv_sector[0]));
-    if (memcmp(&dv_animateptr[0], &animateptr[0], sizeof(dv_animateptr))) faildemoframeverification("difference in animateptr[]");
-    if (fread(&dv_animategoal[0], 4, MAXANIMATES, demoverificationfilep) != MAXANIMATES) goto corrupt;
-    if (memcmp(&dv_animategoal[0], &animategoal[0], sizeof(dv_animategoal))) faildemoframeverification("difference in animategoal[]");
-    if (fread(&dv_animatevel[0], 4, MAXANIMATES, demoverificationfilep) != MAXANIMATES) goto corrupt;
-    if (memcmp(&dv_animatevel[0], &animatevel[0], sizeof(dv_animatevel))) faildemoframeverification("difference in animatevel[]");
-
-    if (fread(&dv_earthquaketime, sizeof(dv_earthquaketime), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_earthquaketime, &earthquaketime, sizeof(dv_earthquaketime))) faildemoframeverification("difference in earthquaketime");
-    if (fread(&dv_ud_from_bonus, sizeof(dv_ud_from_bonus), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_ud_from_bonus, &ud.from_bonus, sizeof(dv_ud_from_bonus))) faildemoframeverification("difference in ud.from_bonus");
-    if (fread(&dv_ud_secretlevel, sizeof(dv_ud_secretlevel), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_ud_secretlevel, &ud.secretlevel, sizeof(dv_ud_secretlevel))) faildemoframeverification("difference in ud.secretlevel");
-
-    if (fread(&dv_ud_god, sizeof(dv_ud_god), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_ud_god, &ud.god, sizeof(dv_ud_god))) faildemoframeverification("difference in ud.god");
-    if (fread(&dv_ud_auto_run, sizeof(dv_ud_auto_run), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_ud_auto_run, &ud.auto_run, sizeof(dv_ud_auto_run))) faildemoframeverification("difference in ud.auto_run");
-    if (fread(&dv_ud_last_level, sizeof(dv_ud_last_level), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_ud_last_level, &ud.last_level, sizeof(dv_ud_last_level))) faildemoframeverification("difference in ud.last_level");
-    if (fread(&dv_ud_eog, sizeof(dv_ud_eog), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_ud_eog, &ud.eog, sizeof(dv_ud_eog))) faildemoframeverification("difference in ud.eog");
-
-    if (fread(&dv_camsprite, sizeof(dv_camsprite), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_camsprite, &camsprite, sizeof(dv_camsprite))) faildemoframeverification("difference in camsprite");
-    if (fread(&dv_connecthead, sizeof(connecthead), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_connecthead, &connecthead, sizeof(dv_connecthead))) faildemoframeverification("difference in connecthead");
-    if (fread(dv_connectpoint2, sizeof(dv_connectpoint2), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_connectpoint2, &connectpoint2, sizeof(dv_connectpoint2))) faildemoframeverification("difference in connectpoint2");
-    if (fread(&dv_numplayersprites, sizeof(dv_numplayersprites), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_numplayersprites, &numplayersprites, sizeof(dv_numplayersprites))) faildemoframeverification("difference in numplayersprites");
-    if (fread((short *)&dv_frags[0][0], sizeof(dv_frags), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_frags[0][0], &frags[0][0], sizeof(dv_frags))) faildemoframeverification("difference in frags[][]");
-
-    if (fread(&dv_randomseed, sizeof(dv_randomseed), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_randomseed, &randomseed, sizeof(dv_randomseed))) faildemoframeverification("difference in randomseed");
-    if (fread(&dv_global_random, sizeof(dv_global_random), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_global_random, &global_random, sizeof(dv_global_random))) faildemoframeverification("difference in global_random");
-    if (fread(&dv_parallaxyscale, sizeof(dv_parallaxyscale), 1, demoverificationfilep) != 1) goto corrupt;
-    if (memcmp(&dv_parallaxyscale, &parallaxyscale, sizeof(dv_parallaxyscale))) faildemoframeverification("difference in parallaxyscale");
-
-    return(0);
-corrupt:
-    Bsprintf(tempbuf, "Demo verification file is corrupt.");
-    gameexit(tempbuf);
-    return -1;
-#endif*/
+#endif
 }
 
 void faildemoframeverification(char* msg)
@@ -9647,14 +9297,16 @@ long playback(void)
         foundemo = opendemoread(which_demo);
     }
 
-    //pogokeen: Ensure that the menu won't be hidden/reset while prepping a new demo
+    PROGRESSDEMOLEVEL:
+    //POGOTODO: remove this menu/demo game mode state hack and replace it with a proper solution
+    //          Note that setting MODE_DEMO here is fixing it being reset when advancing level in continuous demo playback
+    //POGO: Ensure that the menu won't be hidden/reset while prepping a new demo
     if (in_menu)
     {
         ps[myconnectindex].gm |= MODE_MENU;
     }
     ps[myconnectindex].gm |= MODE_DEMO;
 
-    PROGRESSDEMOLEVEL:
     if(foundemo == 0)
     {
         if(which_demo > 1 && demo_break_time <= 0)
@@ -9739,7 +9391,6 @@ long playback(void)
                i++;
                ud.reccnt--;
             }
-            debugSetReccnt(ud.reccnt);
             //domovethings();
             moveloop();
         }
@@ -9838,7 +9489,7 @@ if (VOLUMEONE) {
             return 0;
         }
     }
-    
+
     //POGO: we've hit the end of the level demo, attempt to progress to the next one
     //      (if the recording ends, the file will be closed in demoreadnewboard() )
     if (demoreadnewboard())

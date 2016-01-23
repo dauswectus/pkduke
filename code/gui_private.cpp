@@ -578,8 +578,8 @@ GUI::GUI(int width, int height):m_enabled(false),m_width(width),m_height(height)
 }
 
 void GUI::InsertPKDuke3DCredits() {
-    char pkDukeCreditsString[302];
-    sprintf(pkDukeCreditsString, "\n<h1>pkDuke3d</h1>\n<p>Alex <n>\"pogokeen\"</n> Dawson</p>\n<br /><p>Contributions (C) 2014-2015, Alex Dawson</p>\n<p>pkDuke3d is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<\p>\n");
+    char pkDukeCreditsString[621];
+    sprintf(pkDukeCreditsString, "<h1>pkDuke3d</h1>\n<p>Alex <n>\"pogokeen\"</n> Dawson</p>\n<br />\n<p>pkDuke3D Modifications (C) 2014-2016, Alex Dawson</p>\n<p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>\n<br />\n<p>This program is distributed in the hope that it will be useful but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>\n");
     initprintf("Num docs: %d\n", m_context->GetNumDocuments());
     
     Rocket::Core::ElementDocument* creditsDoc = m_context->GetDocument("menu-credits");

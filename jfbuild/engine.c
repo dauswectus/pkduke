@@ -8807,19 +8807,8 @@ void getmousevalues(long *mousx, long *mousy, long *bstatus)
 //
 long krand(void)
 {
-    if (db_reccnt == 893)
-    {
-        randomseed = randomseed;
-    }
 	randomseed = (randomseed*27584621)+1;
 	return(((unsigned long)randomseed)>>16);
-}
-
-
-db_reccnt = 0L;
-void debugSetReccnt(long reccnt)
-{
-    db_reccnt = reccnt;
 }
 
 //

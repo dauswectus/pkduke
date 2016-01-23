@@ -582,4 +582,7 @@
       <Filter>code\rocket</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
 </Project>
