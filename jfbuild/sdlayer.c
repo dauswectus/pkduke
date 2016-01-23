@@ -121,7 +121,7 @@ int osx_ynbox(char* name, char* buf){
 
 int wm_msgbox(char *name, char *fmt, ...)
 {
-	char buf[1000];
+	char buf[2000];
 	va_list va;
 
 	va_start(va,fmt);
