@@ -116,6 +116,10 @@ void quickkill(struct player_struct *p)
     sprite[p->i].extra = 0;
     sprite[p->i].cstat |= 32768;
     if(ud.god == 0) guts(&sprite[p->i],JIBS6,8,myconnectindex);
+
+    //POGO: track if a player take damage for the NoDMG speedrun category
+    ud.hasNotTakenDmg = false;
+
     return;
 }
 
@@ -2541,6 +2545,9 @@ void processinput(short snum)
 	{
 		s->extra = 0;
 		p->shield_amount = 0;
+
+        //POGO: track if a player take damage for the NoDMG speedrun category
+        ud.hasNotTakenDmg = false;
 	}
 	
 	p->last_extra = s->extra;
