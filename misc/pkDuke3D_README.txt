@@ -7,24 +7,27 @@ $$$$$$ $$ $$$$$$ | PP  \ P| KKKKKK/| DD  | D| UU  | U| KKKKKK/| EEEEEEEE |___  3
   $$$      $$$   | PPPPPPP| KK \  K| DDDDDDD|  UUUUUU| KK \  K|  EEEEEE|  333333| DDDDDDD/    $$$      $$$   
     $$$$$$$$     | PP____/|__/  \__|_______/ \______/|__/  \__/\_______/\______/|_______/       $$$$$$$$     
                  | PP                                                                                        
-                 | PP                                                     (Version 1.0)                      
+                 | PP                                                     (Version 1.1)                      
                  |__/                                                                                        
 
 
   Thanks for downloading and installing pkDuke3D! :)
-  I've been pouring a lot of effort into improving pkDuke3D.
-  This version marks a new version numbering scheme,
-   and the first version of pkDuke3D that includes all of the features I considered absolutely essential for 1.0!
-  Sadly, some features I want to finish up soon didn't make the cut.
-   (mainly LiveSplit integration and some polish to make starting and stopping demo recording easier from in-game)
-  Expect those features to be added in the next release! :)
-  Additionally, when I get more time, I'll release an installer to make setup easier!
+  
+  This release adds various improvements, including an accurate Game-Time timer
+   (classic Duke's game timer is now labelled "Classic").
+  The accurate in-game time allows for a very consistent comparison against other runs
+   without the caveats associated with real-time timing (such as lag/frame timing jitter being included in real-time).
+  Additionally, various improvements have been added & bugs fixed (including an unfortunate timing bug related to menu buffering).
+  A full changelog can be seen in the commit history on BitBucket.
   
   This release should be reasonably stable.
-  Still, I would highly recommend recording videos/livestreaming in addition to recording DMOs, just to be safe!
-   (I'd hate to have some hidden bug cause a demo to desync and ruin a perfect run!)
-
-  Let me know if you run into any issues, and I'll be sure to fix them soon! :)
+  Again, I would still highly recommend recording videos/livestreaming in addition to recording DMOs, just to be safe!
+  Although it shouldn't happen, if your demos ever desync, please send them to me & I can use them to improve pkDuke3D
+   (and potentially fix the demo in the process :) )
+  
+  This version includes improvements suggested by fellow Duke speedrunners;
+   special thanks to everyone for testing & suggesting improvements!
+  Again, please let me know if you run into any issues or have suggestions, and I'll be sure to get them into a new version! :)
    ~pogokeen
 
 
@@ -39,7 +42,7 @@ Features:
 + Provides the option to disable demo cameras (/k on the command-line)
 + When in demo (.DMO) playback mode (/dFILE on the command-line), proper level music is played rather than the main menu theme.
   Additionally, demo statistics are presented at the end of demo playback!
-+ Adds a variety of timers -- track your runs with the classic Duke3D timer or the new Real-Time timers
++ Adds a variety of timers -- track your runs with the classic Duke3D timer or the new accurate Game-Time & Real-Time timers
 + Tracks the speedrun categories your run qualifies for (including Any%, 100S, 100%, Max%)
 + Built on and true to version 1.3.2 of Megaton Edition, one of the nicest versions of Megaton Edition for speedrunning
 

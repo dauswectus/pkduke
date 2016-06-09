@@ -5402,10 +5402,13 @@ void dnNewGame(GameDesc *gamedesc) {
     //          Maybe we simply have to set startedEpisode properly somewhere else as well?
     ps[myconnectindex].player_par = 0;
     ud.totaltime = ud.totaltimestore;
+    ud.accuratetotaltime = ud.accuratetotaltimestore;
     ud.realtotaltime = ud.realtotaltimestore;
     if (ud.recstat != 3 && ud.startedepisode & (1 << gamedesc->volume))
     {
         ud.totaltime = 0;
+        ud.accuratetime = 0;
+        ud.accuratetotaltime = 0;
         ud.realtime = 0;
         ud.realtotaltime = 0;
         ud.startedepisode = 0;
@@ -5479,7 +5482,7 @@ void dnNewGame(GameDesc *gamedesc) {
 	iRet = enterlevel(MODE_GAME);
 
     //POGO: restore stored speedrun category info
-    ud.speedrunCategoriesMet >>= 3;
+    ud.speedrunCategoriesMet >>= sizeof(ud.speedrunCategoriesMet)*8 >> 1;
 
 	//g_LoadingLevel = 0;
 

@@ -1315,6 +1315,14 @@ int handleevents(void)
 }
 
 	while (SDL_PollEvent(&ev)) {
+        if (ev.type == SDL_MOUSEBUTTONDOWN && mouseacquired && moustat) {
+            //POGO: if the mouse is supposed to be grabbed and we click within the window, ensure it is properly grabbed
+            //      This allows us to be more lenient with not grabbing the mouse all the time when we want to use it outside of pkDuke3D
+            //      We have to do this before the GUI has the potential to eat the input
+            SDL_WM_GrabInput(SDL_GRAB_ON);
+			SDL_ShowCursor(SDL_DISABLE);
+        }
+
 		if (GUI_InjectEvent(&ev)) {
 			/* GUI ate the event, don't let it pass through */
             pointer.x = pointer.y = 0;
@@ -1370,16 +1378,11 @@ int handleevents(void)
             
 			case SDL_ACTIVEEVENT:
 				if (ev.active.state & SDL_APPINPUTFOCUS) {
-                    SDL_WM_GrabInput(SDL_GRAB_ON);
-                    SDL_ShowCursor(SDL_DISABLE);
 					appactive = ev.active.gain;
 					if (mouseacquired && moustat) {
-						if (appactive && !GUI_IsEnabled()) {
-//							SDL_WM_GrabInput(SDL_GRAB_ON);
-//							SDL_ShowCursor(SDL_DISABLE);
-						} else {
-//							SDL_WM_GrabInput(SDL_GRAB_OFF);
-//							SDL_ShowCursor(SDL_ENABLE);
+						if (!appactive) {
+							SDL_WM_GrabInput(SDL_GRAB_OFF);
+							SDL_ShowCursor(SDL_ENABLE);
 						}
 					}
 					rv=-1;

@@ -1363,9 +1363,15 @@ void resetpspritevars(char g)
     }
 
     ud.totaltime += ps[myconnectindex].player_par;
+    ud.accuratetotaltime += ud.accuratetime;
     resetplayerstats(0);
-    //POGO: reset real IL time
+    ud.startingLevel = true;
+    ud.endingLevel = 0;
+    //POGO: reset accurate game time & real IL time
+    ud.accuratetime = 0;
     ud.realtime = 0;
+    ud.isPacifist = true;
+    ud.hasNotTakenDmg = true;
 
     for(i=1;i<MAXPLAYERS;i++)
        memcpy(&ps[i],&ps[0],sizeof(ps[0]));
@@ -1769,12 +1775,17 @@ int enterlevel(char g)
     char levname[BMAX_PATH];
 
     //POGO: update what speedrun categories have been met
-    ud.speedrunCategoriesMet &= 0xF8 |
-                                (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) |
-                                (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
-                                 ps[myconnectindex].actors_killed == ps[myconnectindex].max_actors_killed) << 1 |
-                                (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
-                                 ps[myconnectindex].actors_killed == ud.maxKills) << 2;
+    if ((g&MODE_EOL) == MODE_EOL)
+    {
+        ud.speedrunCategoriesMet &= (1<<sizeof(ud.speedrunCategoriesMet)*4)-1 << sizeof(ud.speedrunCategoriesMet)*4 |
+                                    (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                                     ps[myconnectindex].actors_killed == ud.maxKills ? 0x3 :
+                                     ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                                     ps[myconnectindex].actors_killed == ps[myconnectindex].max_actors_killed ? 0x2 :
+                                     ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) |
+                                     ud.hasNotTakenDmg << 2 |
+                                     ud.isPacifist << 3;
+    }
 
     if( (g&MODE_DEMO) != MODE_DEMO ) ud.recstat = ud.m_recstat;
     ud.respawn_monsters = ud.m_respawn_monsters;

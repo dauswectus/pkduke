@@ -56,7 +56,7 @@ Modifications for JonoF's port by Jonathon Fowler(jf@jonof.id.au)
 
 #include "_control.h"
 
-#define VERSION "pkDuke 1.0 (Megaton 1.3.2)"
+#define VERSION "pkDuke 1.1 (Megaton 1.3.2)"
 
 #define HEAD   "Duke Nukem 3D Unregistered Shareware "VERSION
 
@@ -2600,15 +2600,21 @@ void displayrest(long smoothratio)
     minitext_y = minitext_y / (ydim/240.0);
     minitext_x -= (320 * n - 320)/2;
 
-    //POGO: track real time
+    //POGO: track timers
     unsigned long ticks = getticks();
-    char endingLevel = 0;
+    if (ud.startingLevel)
+    {
+        ud.lastclock = ticks;
+        ud.startingLevel = false;
+    }
+    char firstEndingRenderFrame = !ud.endingLevel;
     dnIterPlayers(i)
     {
-        endingLevel |= ps[i].fist_incs;
+        ud.endingLevel |= ps[i].fist_incs;
     }
-    if (!endingLevel && ((ps[myconnectindex].gm&MODE_DEMO) || !(ps[myconnectindex].gm&MODE_MENU)) && !ud.pause_on)
+    if ((!ud.endingLevel || (ud.endingLevel && firstEndingRenderFrame)))
     {
+        ud.accuratetime = ps[myconnectindex].player_par*1000/30;
         ud.realtime += ticks - ud.lastclock;
         ud.realtotaltime += ticks - ud.lastclock;
     }
@@ -2849,50 +2855,48 @@ void displayrest(long smoothratio)
             }
             
             int slen = 0;
-            slen = sprintf(tempbuf, "Curr IL Qualifies As: %s",
-                           (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
-                            ps[myconnectindex].actors_killed == ud.maxKills) ? "Max%" :
-                           (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
-                            ps[myconnectindex].actors_killed == ps[myconnectindex].max_actors_killed) ? "100%" :
-                           (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) ? "100S" : "Any%");
-            //POGO: To right align, note that characters are 4 pixels wide, except spaces which are 5.
-            //      Additionally, the screen width is virtually 320.
-            minitext(320-minitext_x-4*slen-4, minitext_y+6+6+6+6+6, tempbuf, 0, 26);
-
-            slen = sprintf(tempbuf,"Prev Qualify As: %s",
-                           (ud.speedrunCategoriesMet & 0x4) ? "Max%" :
-                           (ud.speedrunCategoriesMet & 0x2) ? "100%" :
-                           (ud.speedrunCategoriesMet & 0x1) ? "100S" : "Any%");
-            minitext(320-minitext_x-4*slen-3, minitext_y+6+6+6+6, tempbuf, 0, 26);
-
             slen = sprintf(tempbuf, "Real Total Time: %lu:%02lu.%03lu",
                            ud.realtotaltime/60000,
                            (ud.realtotaltime%60000) / 1000,
                            ud.realtotaltime%1000);
-            minitext(320-minitext_x-4*slen-3, minitext_y+6+6+6, tempbuf, 0, 26);
+            //POGO: To right align, note that characters are 4 pixels wide, except spaces which are 5.
+            //      Additionally, the screen width is virtually 320.
+            minitext(320-minitext_x-4*slen-3, minitext_y+6+6+6+6+6, tempbuf, 0, 26);
 
             slen = sprintf(tempbuf, "Real Time: %lu:%02lu.%03lu",
                            ud.realtime/60000,
                            (ud.realtime%60000) / 1000,
                            ud.realtime%1000);
+            minitext(320-minitext_x-4*slen-2, minitext_y+6+6+6+6, tempbuf, 0, 26);
+
+            slen = sprintf(tempbuf, "Total Time: %lu:%02lu.%03lu",
+                           (ud.accuratetotaltime+ud.accuratetime)/60000,
+                           ((ud.accuratetotaltime+ud.accuratetime)%60000) / 1000,
+                           (ud.accuratetotaltime+ud.accuratetime)%1000);
+            minitext(320-minitext_x-4*slen-2, minitext_y+6+6+6, tempbuf, 0, 26);
+
+            slen = sprintf(tempbuf, "Lvl Time: %lu:%02lu.%03lu",
+                           ud.accuratetime/60000,
+                           (ud.accuratetime%60000) / 1000,
+                           ud.accuratetime%1000);
             minitext(320-minitext_x-4*slen-2, minitext_y+6+6, tempbuf, 0, 26);
 
-            slen = sprintf(tempbuf, "Total Time: %lu:%02lu",
+            slen = sprintf(tempbuf, "Classic Total Time: %lu:%02lu",
                            ((ud.totaltime + ps[myconnectindex].player_par) / (26 * 60)),
                            ((ud.totaltime + ps[myconnectindex].player_par) / 26) % 60);
-            minitext(320-minitext_x-4*slen-2, minitext_y+6, tempbuf, 0, 26);
+            minitext(320-minitext_x-4*slen-3, minitext_y+6, tempbuf, 0, 26);
 
-            slen = sprintf(tempbuf, "Lvl Time: %ld:%02ld",
+            slen = sprintf(tempbuf, "Classic Lvl Time: %ld:%02ld",
                            (ps[myconnectindex].player_par / (26 * 60)),
                            (ps[myconnectindex].player_par / 26) % 60);
-            minitext(320-minitext_x-4*slen-2, minitext_y, tempbuf, 0, 26);
+            minitext(320-minitext_x-4*slen-3, minitext_y, tempbuf, 0, 26);
 
 
             sprintf(tempbuf, "FPS: %d", dnFPS);
-            minitext(minitext_x,minitext_y+6+6+6,tempbuf,0,26);
+            minitext(minitext_x,minitext_y+6+6+6+6+6+6,tempbuf,0,26);
             
             sprintf(tempbuf, "Rec: %s", ud.recstat == 1 ? "IL" : ud.recstat == 3 ? "CN" : "OFF");
-            minitext(minitext_x, minitext_y+6+6, tempbuf, 0, 26);
+            minitext(minitext_x, minitext_y+6+6+6+6+6, tempbuf, 0, 26);
             
             if(ud.player_skill > 3 )
             {
@@ -2906,10 +2910,31 @@ void displayrest(long smoothratio)
                 sprintf(tempbuf,"Kills: %ld/%ld (Max: %lu)",
                         ps[myconnectindex].actors_killed, ps[myconnectindex].max_actors_killed, ud.maxKills);
             }
-            minitext(minitext_x,minitext_y+6,tempbuf,0,26);
+            minitext(minitext_x,minitext_y+6+6+6+6,tempbuf,0,26);
             
             sprintf(tempbuf,"Secrets: %ld/%ld", ps[myconnectindex].secret_rooms,ps[myconnectindex].max_secret_rooms);
-            minitext(minitext_x, minitext_y,tempbuf,0,26);
+            minitext(minitext_x, minitext_y+6+6+6,tempbuf,0,26);
+
+            sprintf(tempbuf,"Skill: %d", ud.player_skill);
+            minitext(minitext_x, minitext_y+6+6,tempbuf,0,26);
+
+            sprintf(tempbuf, "Curr IL Qualifies As: %s%s%s",
+                    (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                     ps[myconnectindex].actors_killed == ud.maxKills) ? "Max%" :
+                    (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
+                     ps[myconnectindex].actors_killed == ps[myconnectindex].max_actors_killed) ? "100%" :
+                    (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) ? "100S" : "Any%",
+                    ud.hasNotTakenDmg ? "(NoDMG)" : "",
+                    /*ud.isPacifist ? "(Pacifist)" : */"");
+            minitext(minitext_x, minitext_y+6, tempbuf, 0, 26);
+
+            sprintf(tempbuf,"Prev Qualify As: %s%s%s",
+                    (ud.speedrunCategoriesMet == 0x3) ? "Max%" :
+                    (ud.speedrunCategoriesMet == 0x2) ? "100%" :
+                    (ud.speedrunCategoriesMet == 0x1) ? "100S" : "Any%",
+                    (ud.speedrunCategoriesMet & 0x4) ? "(NoDMG)" : "",
+                    /*(ud.speedrunCategoriesMet & 0x8) ? "(Pacifist)" :*/ "");
+            minitext(minitext_x, minitext_y, tempbuf, 0, 26);
         }
         if (tintf > 0 || dotint) palto(tintr,tintg,tintb,tintf|128);
 }
@@ -7402,6 +7427,11 @@ void set_addon(int selected_addon) {
     addon = selected_addon;
     
     addsearchpath(official_addons[addon].folder);
+    //POGOTODO: FILESEARCHLOCATIONS
+    //          comment this back in when I come back to finish the rest of the necessary changes
+    /*char upperLevelPath[1024] = "../gameroot";
+    strncat(upperLevelPath, official_addons[addon].folder, 1024-12);
+    addsearchpath(upperLevelPath);*/
     
     // load grp
     s = (struct strllist *)calloc(1,sizeof(struct strllist));
@@ -7452,14 +7482,21 @@ void checkcommandline(int argc,char **argv)
     ud.disableCameras = 0;
     ud.demoPlayerMode = 0;
     ud.demoStartFromScratch = 0;
+    ud.startingLevel = true;
+    ud.endingLevel = 0;
     ud.totaltime = 0;
+    ud.accuratetime = 0;
+    ud.accuratetotaltime = 0;
     ud.realtime = 0;
     ud.realtotaltime = 0;
     ud.totaltimestore = 0;
+    ud.accuratetotaltimestore = 0;
     ud.realtotaltimestore = 0;
     ud.lastclock = getticks();
     ud.maxKills = 0;
     ud.speedrunCategoriesMet = 0xFF;
+    ud.isPacifist = true;
+    ud.hasNotTakenDmg = true;
     ud.startedepisode = 0xF;
     ud.god = 0;
     ud.m_respawn_items = 0;
@@ -8359,6 +8396,12 @@ void app_main(int argc,char **argv)
     addsearchpath("./music");
     addsearchpath("./addons");
 
+    //POGOTODO: FILESEARCHLOCATIONS
+    //          comment this back in when I come back to finish the rest of the necessary changes
+    /*addsearchpath("../gameroot");
+    addsearchpath("../gameroot/music");
+    addsearchpath("../gameroot/addons");*/
+
 	checkcommandline(argc,argv);
     
 	dnPullCloudFiles();
@@ -8867,6 +8910,8 @@ char opendemoread(char which_demo) // 0 = mine
      ud.showweapons =  ud.pause_on = ud.auto_run = 0;
 
      ud.totaltime = 0;
+     ud.accuratetime = 0;
+     ud.accuratetotaltime = 0;
      ud.realtime = 0;
      ud.realtotaltime = 0;
 
@@ -9270,10 +9315,11 @@ long playback(void)
 
     //POGO: store the current game times for when we start a new episode, so demo playback doesn't screw them up
     ud.totaltimestore = ud.totaltime+ps[myconnectindex].player_par;
+    ud.accuratetotaltimestore = ud.accuratetotaltime + ps[myconnectindex].player_par*1000/30;
     ud.realtotaltimestore = ud.realtotaltime;
     ps[myconnectindex].player_par = 0;
     //POGO: also store speedrun categories met
-    ud.speedrunCategoriesMet <<= 3;
+    ud.speedrunCategoriesMet <<= sizeof(ud.speedrunCategoriesMet)*8 >> 1;
 
     RECHECK:
 
@@ -9348,7 +9394,7 @@ long playback(void)
         if (ud.totaltime == 0)
         {
             //POGO: If this is the first map in the demo, we should reset the prev speedrun categories met to all set
-            ud.speedrunCategoriesMet |= 0x7;
+            ud.speedrunCategoriesMet |= (1 << (sizeof(ud.speedrunCategoriesMet)*8 >> 1)) - 1;
         }
     }
 
@@ -10931,25 +10977,36 @@ void dobonus(char bonusonly)
                         sound(PIPEBOMB_EXPLODE);
                     }
 					
-                    sprintf(tempbuf,"%s",
-                            (ud.speedrunCategoriesMet & 0x4) ? "Max%" :
-                            (ud.speedrunCategoriesMet & 0x2) ? "100%" :
-                            (ud.speedrunCategoriesMet & 0x1) ? "100S" : "Any%");
+                    sprintf(tempbuf,"%s%s%s",
+                            (ud.speedrunCategoriesMet == 0x3) ? "Max%" :
+                            (ud.speedrunCategoriesMet == 0x2) ? "100%" :
+                            (ud.speedrunCategoriesMet == 0x1) ? "100S" : "Any%",
+                            (ud.speedrunCategoriesMet & 0x4) ? "(NoDMG)" : "",
+                            /*(ud.speedrunCategoriesMet & 0x8) ? "(Pacifist)" : */"");
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
-                    sprintf(tempbuf,"%s",
+                    sprintf(tempbuf,"%s%s%s",
                             (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
                              ps[myconnectindex].actors_killed == ud.maxKills) ? "Max%" :
                             (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms &&
                              ps[myconnectindex].actors_killed == ps[myconnectindex].max_actors_killed) ? "100%" :
-                            (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) ? "100S" : "Any%");
+                            (ps[myconnectindex].secret_rooms == ps[myconnectindex].max_secret_rooms) ? "100S" : "Any%",
+                            ud.hasNotTakenDmg ? "(NoDMG)" : "",
+                            /*ud.isPacifist ? "(Pacifist)" : */"");
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
 
-                    sprintf(tempbuf,"%0*ld:%02ld",clockpad,
-                        (ps[myconnectindex].player_par/(26*60)),
-                        (ps[myconnectindex].player_par/26)%60);
+                    sprintf(tempbuf,"%02lu:%02lu.%03lu (%0*ld:%02ld)",
+                            ud.accuratetime/60000,
+                            (ud.accuratetime%60000) / 1000,
+                            ud.accuratetime%1000,
+                            clockpad,
+                            (ps[myconnectindex].player_par/(26*60)),
+                            (ps[myconnectindex].player_par/26)%60);
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
 
-                    sprintf(tempbuf, "%02lu:%02lu",
+                    sprintf(tempbuf, "%02lu:%02lu.%03lu (%02lu:%02lu)",
+                            (ud.accuratetotaltime+ud.accuratetime)/60000,
+                            ((ud.accuratetotaltime+ud.accuratetime)%60000) / 1000,
+                            (ud.accuratetotaltime+ud.accuratetime)%1000,
                             ((ud.totaltime + ps[myconnectindex].player_par) / (26 * 60)),
                             ((ud.totaltime + ps[myconnectindex].player_par) / 26) % 60);
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;

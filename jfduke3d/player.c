@@ -100,6 +100,9 @@ void incur_damage( struct player_struct *p )
         }
 
         sprite[p->i].extra = p->last_extra + damage;
+
+        //POGO: track if a player take damage for the NoDMG speedrun category
+        ud.hasNotTakenDmg = false;
     }
 }
 

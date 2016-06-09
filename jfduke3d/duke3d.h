@@ -332,13 +332,17 @@ struct user_defs
     int32 timelimit; /* measured in seconds, 0 if not set */
     unsigned long matchtime;
 
-    unsigned long totaltime, realtime, realtotaltime;
-    unsigned long totaltimestore, realtotaltimestore;
+    char startingLevel, endingLevel;
+    unsigned long totaltime, accuratetime, accuratetotaltime, realtime, realtotaltime;
+    unsigned long totaltimestore, accuratetotaltimestore, realtotaltimestore;
 
     unsigned long lastclock;
 
     unsigned long maxKills;
     unsigned char speedrunCategoriesMet;
+    char hasNotTakenDmg;
+    //POGOTODO: pacifist run tracking
+    char isPacifist;
 
     unsigned char startedepisode;
 };
