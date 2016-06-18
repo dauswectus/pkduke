@@ -56,7 +56,7 @@ Modifications for JonoF's port by Jonathon Fowler(jf@jonof.id.au)
 
 #include "_control.h"
 
-#define VERSION "pkDuke 1.1 (Megaton 1.3.2)"
+#define VERSION "pkDuke3D 1.1.1 (Megaton 1.3.2)"
 
 #define HEAD   "Duke Nukem 3D Unregistered Shareware "VERSION
 
@@ -2612,9 +2612,8 @@ void displayrest(long smoothratio)
     {
         ud.endingLevel |= ps[i].fist_incs;
     }
-    if ((!ud.endingLevel || (ud.endingLevel && firstEndingRenderFrame)))
+    if (!ud.endingLevel || firstEndingRenderFrame)
     {
-        ud.accuratetime = ps[myconnectindex].player_par*1000/30;
         ud.realtime += ticks - ud.lastclock;
         ud.realtotaltime += ticks - ud.lastclock;
     }
@@ -2870,15 +2869,15 @@ void displayrest(long smoothratio)
             minitext(320-minitext_x-4*slen-2, minitext_y+6+6+6+6, tempbuf, 0, 26);
 
             slen = sprintf(tempbuf, "Total Time: %lu:%02lu.%03lu",
-                           (ud.accuratetotaltime+ud.accuratetime)/60000,
-                           ((ud.accuratetotaltime+ud.accuratetime)%60000) / 1000,
-                           (ud.accuratetotaltime+ud.accuratetime)%1000);
+                           (ud.accuratetotaltime+ud.accuratetime)*1000/30 / 60000,
+                           (((ud.accuratetotaltime+ud.accuratetime)*1000/30) % 60000) / 1000,
+                           ((ud.accuratetotaltime+ud.accuratetime)*1000/30) % 1000);
             minitext(320-minitext_x-4*slen-2, minitext_y+6+6+6, tempbuf, 0, 26);
 
             slen = sprintf(tempbuf, "Lvl Time: %lu:%02lu.%03lu",
-                           ud.accuratetime/60000,
-                           (ud.accuratetime%60000) / 1000,
-                           ud.accuratetime%1000);
+                           (ud.accuratetime*1000/30)/60000,
+                           ((ud.accuratetime*1000/30)%60000) / 1000,
+                           (ud.accuratetime*1000/30)%1000);
             minitext(320-minitext_x-4*slen-2, minitext_y+6+6, tempbuf, 0, 26);
 
             slen = sprintf(tempbuf, "Classic Total Time: %lu:%02lu",
@@ -9315,9 +9314,10 @@ long playback(void)
 
     //POGO: store the current game times for when we start a new episode, so demo playback doesn't screw them up
     ud.totaltimestore = ud.totaltime+ps[myconnectindex].player_par;
-    ud.accuratetotaltimestore = ud.accuratetotaltime + ps[myconnectindex].player_par*1000/30;
+    ud.accuratetotaltimestore = ud.accuratetotaltime + ud.accuratetime;
     ud.realtotaltimestore = ud.realtotaltime;
     ps[myconnectindex].player_par = 0;
+    ud.accuratetime = 0;
     //POGO: also store speedrun categories met
     ud.speedrunCategoriesMet <<= sizeof(ud.speedrunCategoriesMet)*8 >> 1;
 
@@ -10161,6 +10161,12 @@ char domovethings(void)
     
     quitgame = 0;
 
+    //POGO: increment the accurate game-time timer
+    if(ud.pause_on == 0 &&
+       !ud.endingLevel)
+    {
+        ++ud.accuratetime;
+    }
 	
 	dnResyncIfNeeded();
 	
@@ -10415,8 +10421,6 @@ void doorders(void)
     while( !KB_KeyWaiting() ) { handleevents(); getpackets(); }
 }
 
-//POGOTODO: add "IL Qualifies For:" and "RTA/SS/MS Qualifies For:" to the intermission screen
-//POGOTODO: should I simplify the ones on the level stats to show only the most specific run category qualified for so far?
 void dobonus(char bonusonly)
 {
     short t, r, tinc,gfx_offset;
@@ -10995,18 +10999,18 @@ void dobonus(char bonusonly)
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
 
                     sprintf(tempbuf,"%02lu:%02lu.%03lu (%0*ld:%02ld)",
-                            ud.accuratetime/60000,
-                            (ud.accuratetime%60000) / 1000,
-                            ud.accuratetime%1000,
+                            ud.accuratetime*1000/30 / 60000,
+                            ((ud.accuratetime*1000/30)%60000) / 1000,
+                            (ud.accuratetime*1000/30)%1000,
                             clockpad,
                             (ps[myconnectindex].player_par/(26*60)),
                             (ps[myconnectindex].player_par/26)%60);
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
 
                     sprintf(tempbuf, "%02lu:%02lu.%03lu (%02lu:%02lu)",
-                            (ud.accuratetotaltime+ud.accuratetime)/60000,
-                            ((ud.accuratetotaltime+ud.accuratetime)%60000) / 1000,
-                            (ud.accuratetotaltime+ud.accuratetime)%1000,
+                            (ud.accuratetotaltime+ud.accuratetime)*1000/30 / 60000,
+                            (((ud.accuratetotaltime+ud.accuratetime)*1000/30)%60000) / 1000,
+                            ((ud.accuratetotaltime+ud.accuratetime)*1000/30)%1000,
                             ((ud.totaltime + ps[myconnectindex].player_par) / (26 * 60)),
                             ((ud.totaltime + ps[myconnectindex].player_par) / 26) % 60);
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;

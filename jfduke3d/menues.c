@@ -5401,13 +5401,13 @@ void dnNewGame(GameDesc *gamedesc) {
     //          But, if it's in the newgame() method, would that negatively harm multi-episode demo playback?
     //          Maybe we simply have to set startedEpisode properly somewhere else as well?
     ps[myconnectindex].player_par = 0;
+    ud.accuratetime = 0;
     ud.totaltime = ud.totaltimestore;
     ud.accuratetotaltime = ud.accuratetotaltimestore;
     ud.realtotaltime = ud.realtotaltimestore;
     if (ud.recstat != 3 && ud.startedepisode & (1 << gamedesc->volume))
     {
         ud.totaltime = 0;
-        ud.accuratetime = 0;
         ud.accuratetotaltime = 0;
         ud.realtime = 0;
         ud.realtotaltime = 0;

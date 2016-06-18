@@ -7,17 +7,20 @@ $$$$$$ $$ $$$$$$ | PP  \ P| KKKKKK/| DD  | D| UU  | U| KKKKKK/| EEEEEEEE |___  3
   $$$      $$$   | PPPPPPP| KK \  K| DDDDDDD|  UUUUUU| KK \  K|  EEEEEE|  333333| DDDDDDD/    $$$      $$$   
     $$$$$$$$     | PP____/|__/  \__|_______/ \______/|__/  \__/\_______/\______/|_______/       $$$$$$$$     
                  | PP                                                                                        
-                 | PP                                                     (Version 1.1)                      
+                 | PP                                                     (Version 1.1.1)                      
                  |__/                                                                                        
 
 
   Thanks for downloading and installing pkDuke3D! :)
   
-  This release adds various improvements, including an accurate Game-Time timer
+  This major release (1.1) adds various improvements, including an accurate Game-Time timer
    (classic Duke's game timer is now labelled "Classic").
   The accurate in-game time allows for a very consistent comparison against other runs
    without the caveats associated with real-time timing (such as lag/frame timing jitter being included in real-time).
   Additionally, various improvements have been added & bugs fixed (including an unfortunate timing bug related to menu buffering).
+  
+  This minor update (1.1.1) improves the Game-Time timer further, keeping it running even when the player is dead or frozen
+   (which was an issue with Duke3D's original game timer).
   A full changelog can be seen in the commit history on BitBucket.
   
   This release should be reasonably stable.
