@@ -116,6 +116,23 @@ void Sys_CenterWindow (int w, int h) {
     MoveWindow(hwnd, x, y, w, h, FALSE);
 }
 
+void Sys_GetWindowPosition(int* x, int* y)
+{
+    HWND hwnd = GetHwnd();
+    RECT rc;
+    GetWindowRect(hwnd, &rc);
+    *x = rc.left;
+    *y = rc.top;
+}
+
+void Sys_MoveWindow(int x, int y)
+{
+    HWND hwnd = GetHwnd();
+    RECT rc;
+    GetWindowRect(hwnd, &rc);
+    MoveWindow(hwnd, x, y, rc.right-rc.left, rc.bottom-rc.top, FALSE);
+}
+
 void Sys_OutputDebugString (const char *string) {
     OutputDebugStringA(string);
 }

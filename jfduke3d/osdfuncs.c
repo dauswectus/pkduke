@@ -2,6 +2,9 @@
 #include "build.h"
 #include "names.h"
 
+//POGOTODO: change these to render using RocketLib menus
+//POGOTODO: add functions for setting mouse sensitivity, binding controls, recording demos, changing hud elements, cheating, etc.
+
 void GAME_drawosdchar(int x, int y, char ch, int shade, int pal)
 {
 	short ac;
@@ -51,9 +54,10 @@ int GAME_getrowheight(int w)
 
 void GAME_onshowosd(int shown)
 {
-	if (numplayers == 1)
-		if ((shown && !ud.pause_on) || (!shown && ud.pause_on))
-			KB_KeyDown[sc_Pause] = 1;
+    if (numplayers == 1 && ud.recstat != 2)
+    {
+        ud.pause_on = shown;
+    }
 }
 
 //#define BGTILE 311

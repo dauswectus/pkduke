@@ -4704,6 +4704,7 @@ if (VOLUMEALL) {
     }
 }
 
+char preLevelBlackScreen = 0;
 void palto(char r,char g,char b,long e)
 {
 //    int i;
@@ -4725,9 +4726,11 @@ void palto(char r,char g,char b,long e)
 	setpalettefade(r,g,b,e&127);
 	if (getrendermode() >= 3) pus = pub = NUMPAGES;	// JBF 20040110: redraw the status bar next time
     if ((e&128) == 0) {
-	    nextpage();
-	    for (tc = totalclock; totalclock < tc + 4; handleevents(), getpackets() );
+        preLevelBlackScreen = 1;
+        nextpage();
+	    for (tc = totalclock; totalclock < tc + 4; handleevents(), getpackets());
     }
+    preLevelBlackScreen = 0;
 }
 
 
@@ -5203,7 +5206,7 @@ void playanm(char *fn, char t) {
         
         walock[TILE_ANIM] = 219+t;
         
-        allocache((intptr_t *)&animbuf, length+1, &walock[TILE_ANIM]);
+        animbuf = malloc(length + 1);
         
         tilesizx[TILE_ANIM] = 200;
         tilesizy[TILE_ANIM] = 320;
@@ -5284,6 +5287,10 @@ void playanm(char *fn, char t) {
     end_anim:
         KB_FlushKeyboardQueue();
         ANIM_FreeAnim();
+        if (animbuf != NULL)
+        {
+            free(animbuf);
+        }
         walock[TILE_ANIM] = 1;
     }
     
@@ -5405,6 +5412,10 @@ void dnNewGame(GameDesc *gamedesc) {
     ud.totaltime = ud.totaltimestore;
     ud.accuratetotaltime = ud.accuratetotaltimestore;
     ud.realtotaltime = ud.realtotaltimestore;
+    //POGO: clear the time store vars so that we know we don't have any total times stored
+    ud.totaltimestore = 0;
+    ud.accuratetotaltimestore = 0;
+    ud.realtotaltimestore = 0;
     if (ud.recstat != 3 && ud.startedepisode & (1 << gamedesc->volume))
     {
         ud.totaltime = 0;
@@ -5503,7 +5514,11 @@ void dnHideMenu() {
     ps[myconnectindex].gm &= ~MODE_MENU;
     if(ud.multimode < 2 && ud.recstat != 2) {
         ready2send = 1;
-        totalclock = ototalclock;
+        //POGO: this fixes the prelevel blackscreen without affecting any other aspects of gameplay
+        if (!preLevelBlackScreen)
+        {
+            totalclock = ototalclock;
+        }
     }
 }
 

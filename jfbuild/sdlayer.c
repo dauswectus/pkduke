@@ -623,7 +623,7 @@ int inittimer(int tickspersecond)
 
 	timerfreq = 1000;
 	timerticspersec = tickspersecond;
-	timerlastsample = SDL_GetTicks() * timerticspersec / timerfreq;
+	timerlastsample = (SDL_GetTicks() * timerticspersec / timerfreq) % (timerticspersec*timerticspersec);
 
 	usertimercallback = NULL;
 
@@ -647,19 +647,27 @@ void uninittimer(void)
 //
 void sampletimer(void)
 {
-	Uint32 i;
-	long n;
-	
-	if (!timerfreq) return;
-	
-	i = SDL_GetTicks();
-	n = (long)(i * timerticspersec / timerfreq) - timerlastsample;
-	if (n>0) {
-		totalclock += n;
-		timerlastsample += n;
-	}
+    Uint32 i;
+    long n;
 
-	if (usertimercallback) for (; n>0; n--) usertimercallback();
+    if (!timerfreq) return;
+
+    //POGO: using modulo arithmetic to reduce the domain of i & timerlastsample fixes the overflow bug that would occur every ~10 hours without affecting timing in any other way
+    Uint32 commonMultiple = timerticspersec * timerfreq;
+    i = SDL_GetTicks() % commonMultiple;
+    if (timerlastsample > (i * timerticspersec / timerfreq))
+    {
+        i += commonMultiple;
+    }
+
+    n = (long)(i * timerticspersec / timerfreq) - timerlastsample;
+    if (n>0) {
+        totalclock += n;
+        //POGO: commonMultiple * timerticspersec / timerfreq is equal to timerticspersec*timerticspersec
+        timerlastsample = (timerlastsample + n) % (timerticspersec*timerticspersec);
+    }
+
+    if (usertimercallback) for (; n>0; n--) usertimercallback();
 }
 
 //
@@ -955,12 +963,22 @@ int setvideomode(int x, int y, int c, int fs, int force)
 				SDL_GL_SetAttribute(attributes[i].attr, j);
 			}
 
-			if (!fs) {
+            //POGO: Don't recenter the window
+			/*if (!fs) {
 				Sys_CenterWindow(x, y);
-			}
+			}*/
 
 			GUI_PreModeChange();
+            //POGOTODO: I may not actually need this GetWindowPosition here, this was just testing
+            //POGO: Commenting this out for later
+            // int winPosX, winPosY;
+            // Sys_GetWindowPosition(&winPosX, &winPosY);
 			sdl_surface = SDL_SetVideoMode(x, y, c, SDL_OPENGL | ((fs&1)?SDL_FULLSCREEN:0));
+            if (!fs)
+            {
+                //POGOTODO: make this move the window to the last position if we're just starting the game
+                //Sys_MoveWindow(winPosX, winPosY);
+            }
 			if (!sdl_surface) {
 				if (multisamplecheck) {
 					initprintf("Multisample mode not possible. Retrying without multisampling.\n");
@@ -1400,6 +1418,7 @@ int handleevents(void)
                 break;
 
 			case SDL_MOUSEMOTION:
+                //POGOTODO: re-evaluate this alongside the intermittent focus gain loss idea for Cube's mouse issue
                 if (0 && skip_next_motion) {
                     skip_next_motion = 0;
                 } else {

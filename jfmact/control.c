@@ -17,6 +17,7 @@
 #include "baselayer.h"
 #include "compat.h"
 #include "pragmas.h"
+#include "osd.h"
 
 #include "dnAPI.h"
 
@@ -1312,6 +1313,11 @@ void dnBindFunction(int function, int slot, dnKey key) {
             }
         }
         dnFuncBindings[function][slot] = key;
+    }
+
+    if (function == gamefunc_Show_Console)
+    {
+        OSD_CaptureKey(key, slot);
     }
 }
 

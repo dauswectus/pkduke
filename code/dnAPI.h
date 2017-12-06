@@ -158,6 +158,8 @@ char * dnFilterUsername(const char * name);
 
 void Sys_GetScreenSize(int *width, int *height);
 void Sys_CenterWindow(int width, int height);
+void Sys_GetWindowPosition(int* x, int* y);
+void Sys_MoveWindow(int x, int y);
 double Sys_GetTicks();
 void Sys_DPrintf(const char *format, ...);
 int Sys_FileExists(const char *path);

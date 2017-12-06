@@ -1335,6 +1335,7 @@ void GUI::Render() {
         m_menu->GetCurrentPage(m_context)->Hide();
     }
 
+    //POGO: if demo mode is set and menu mode is not set we can end up with a menuing bug here if we're in intermission mode (recstat==4)
     if (m_enabled || (dnDemoModeSet() && !dnMenuModeSet() && ud.recstat == 4)) {
         GL_SetUIMode(m_width, m_height, m_menu_scale, m_menu_offset_x, m_menu_offset_y);
 
@@ -1815,6 +1816,8 @@ bool GUI::DoCommand(Rocket::Core::Element *element, const Rocket::Core::String& 
 		ReadChosenSkillAndEpisode(&skill, &episode);
 		Enable(false);
         ps[myconnectindex].gm &= ~MODE_MENU;
+        //POGOFIX: this fixes the menu showing over top of the cinematics during the demo intermissions
+        ps[myconnectindex].gm &= ~MODE_DEMO;
 		m_menu->ShowDocument(m_context, "menu-ingame", false);
         // for usermap level should be 7 and episode should be 0
 		NewGame(skill, episode, (dnIsUserMap() ? 7 : 0));
@@ -2047,6 +2050,7 @@ void GUI::LoadGameCommand(Rocket::Core::Element *element) {
             LoadGameAction(Rocket::Core::ElementDocument *back_page, Rocket::Core::Context *context, RocketMenuPlugin *menu, int slot):ConfirmableAction(back_page),context(context),menu(menu),slot(slot){}
             virtual void Yes() {
                 if (dnLoadGame(slot) == 0) {
+                    //POGOTODO: crashed here, read access violation on escape after load game. this->menu was 0xDDDDDDDD.
                     menu->ShowDocument(context, "menu-ingame", false);
                 }
             }

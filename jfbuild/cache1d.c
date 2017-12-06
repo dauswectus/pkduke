@@ -160,6 +160,8 @@ void allocache(long *newhandle, long newbytes, char *newlockptr)
 
 	//printf("%ld %ld %ld\n",besto,newbytes,*newlockptr);
 
+    //POGOTODO: the cache space is being all used up by cutscenes!  Why is this?
+    //          I just decided to switch the cutscenes to use malloc instead of the cache for now
 	if (bestval == 0x7fffffff)
 		reportandexit("CACHE SPACE ALL LOCKED UP!");
 

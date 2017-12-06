@@ -51,6 +51,8 @@ int  OSD_HandleKey(int sc, int press);
 // handles the readjustment when screen resolution changes
 void OSD_ResizeDisplay(int w,int h);
 
+void OSD_ToggleDisplay();
+
 // shows or hides the onscreen display
 void OSD_ShowDisplay(int onf);
 

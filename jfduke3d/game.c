@@ -56,7 +56,7 @@ Modifications for JonoF's port by Jonathon Fowler(jf@jonof.id.au)
 
 #include "_control.h"
 
-#define VERSION "pkDuke3D 1.1.1 (Megaton 1.3.2)"
+#define VERSION "pkDuke3D 1.2RC (Megaton 1.3.2)"
 
 #define HEAD   "Duke Nukem 3D Unregistered Shareware "VERSION
 
@@ -2612,6 +2612,9 @@ void displayrest(long smoothratio)
     {
         ud.endingLevel |= ps[i].fist_incs;
     }
+    //POGOTODO: this!
+    /*if (((ps[myconnectindex].gm&MODE_DEMO) || !(ps[myconnectindex].gm&MODE_MENU)) && !ud.pause_on &&
+        (!ud.endingLevel || firstEndingRenderFrame))*/
     if (!ud.endingLevel || firstEndingRenderFrame)
     {
         ud.realtime += ticks - ud.lastclock;
@@ -6819,7 +6822,6 @@ if (VOLUMEONE) {
 
 void fn_gamefuncs(void){
     if(!ALT_IS_PRESSED && !SHIFTS_IS_PRESSED) {
-        
         if (BUTTON(gamefunc_Help_Menu)) {
             BUTTONCLEAR(gamefunc_Help_Menu);
             GUI_ShowHelpMenu();
@@ -9312,10 +9314,14 @@ long playback(void)
         ud.recstat = 4;
     }
 
-    //POGO: store the current game times for when we start a new episode, so demo playback doesn't screw them up
-    ud.totaltimestore = ud.totaltime+ps[myconnectindex].player_par;
-    ud.accuratetotaltimestore = ud.accuratetotaltime + ud.accuratetime;
-    ud.realtotaltimestore = ud.realtotaltime;
+    //POGO: if we don't have total times stored already, store the current game times for when we start a new episode,
+    //      so demo playback doesn't screw them up
+    if (ud.totaltimestore == 0)
+    {
+        ud.totaltimestore = ud.totaltime+ps[myconnectindex].player_par;
+        ud.accuratetotaltimestore = ud.accuratetotaltime + ud.accuratetime;
+        ud.realtotaltimestore = ud.realtotaltime;
+    }
     ps[myconnectindex].player_par = 0;
     ud.accuratetime = 0;
     //POGO: also store speedrun categories met

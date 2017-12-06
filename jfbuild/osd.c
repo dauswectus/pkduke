@@ -361,8 +361,8 @@ int OSD_HandleKey(int sc, int press)
 	
 	if (!osdinited) return sc;
 
-	if (sc == osdkey0 || sc == osdkey1) {
-		OSD_ShowDisplay(osdvisible ^ 1);
+	if (press && (sc == osdkey0 || sc == osdkey1)) {
+        OSD_ToggleDisplay();
 		bflushchars();
 		return 0;//sc;
 	} else if (!osdvisible) {
@@ -645,6 +645,14 @@ void OSD_ResizeDisplay(int w, int h)
 	osdeditwinstart = 0;
 	osdeditwinend = editlinewidth;
 	white = -1;
+}
+
+//
+// OSD_ToggleDisplay()
+//
+void OSD_ToggleDisplay()
+{
+    OSD_ShowDisplay(!osdvisible);
 }
 
 
