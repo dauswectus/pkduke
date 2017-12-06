@@ -660,6 +660,22 @@ void sampletimer(void)
         i += commonMultiple;
     }
 
+    //POGO: The nominal resulting sequence for timer increments is increment n first after 9ms, then 8ms, then 8ms, then restart the pattern at 9ms.
+    //This is due to the precision of this integer math.
+    //You can see this by checking at what intervals (i * timerticspersec) / timerfreq increases by one (for timerticspersec=120 and timerfreq=1000)
+    //It will be first at i=9 (i * timerticspersec == 1080)
+    //Second time at i=17 (i * timerticspersec == 2040)
+    //Third time at i=25 (i * timerticspersec == 3000)
+    //Then our remainder is 0, so reset the sequence.
+    //Because TICSPERFRAME is 120/26, rounding ensures it takes exactly 4 gametics before a game update
+    //We're targeting 26 updates per second, but instead we get close to 30.
+    //The update sequence ends up being (where each | is a game update):
+    //9ms,8ms,8ms,9ms|8ms,8ms,9ms,8ms|8ms,9ms,8ms,8ms|  Sequence restarts here
+    //      34ms     |      33ms     |      33ms     |
+    //This means that every 3 game updates takes 100ms
+    //This matches what one would expect for a 30 game update per second game.
+    //If we actually were achieving 26 updates per second, 3 game updates would take approx. 115ms
+    //This accounts for the discrepency in the game's original par timer.
     n = (long)(i * timerticspersec / timerfreq) - timerlastsample;
     if (n>0) {
         totalclock += n;

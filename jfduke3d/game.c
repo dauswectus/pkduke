@@ -2871,6 +2871,11 @@ void displayrest(long smoothratio)
                            ud.realtime%1000);
             minitext(320-minitext_x-4*slen-2, minitext_y+6+6+6+6, tempbuf, 0, 26);
 
+            //POGOTODO: *1000/30 is fine if we're doing floating point math, but if this is integer math, we'll run fast by 1ms every 3 game updates (we'll count 99ms instead of 100ms)
+            //          This is an error of 10ms for every second played. (We'll run fast by 3 seconds for every 5 minutes played)
+            //          Fix this either by adding 1ms for every 3 gametics, or by using floating point math
+            //          Note that it would be nice to also account for the particular gametic that runs long, but it might be hard to determine which particular tic that is at any given time
+            //           (we'd probably have to modify sdlayer.c to provide a function to determine which of the 9ms/8ms/8ms update timings we're on)
             slen = sprintf(tempbuf, "Total Time: %lu:%02lu.%03lu",
                            (ud.accuratetotaltime+ud.accuratetime)*1000/30 / 60000,
                            (((ud.accuratetotaltime+ud.accuratetime)*1000/30) % 60000) / 1000,
@@ -2931,9 +2936,9 @@ void displayrest(long smoothratio)
             minitext(minitext_x, minitext_y+6, tempbuf, 0, 26);
 
             sprintf(tempbuf,"Prev Qualify As: %s%s%s",
-                    (ud.speedrunCategoriesMet == 0x3) ? "Max%" :
-                    (ud.speedrunCategoriesMet == 0x2) ? "100%" :
-                    (ud.speedrunCategoriesMet == 0x1) ? "100S" : "Any%",
+                    ((ud.speedrunCategoriesMet & 0x3) == 0x3) ? "Max%" :
+                    (ud.speedrunCategoriesMet & 0x2) ? "100%" :
+                    (ud.speedrunCategoriesMet & 0x1) ? "100S" : "Any%",
                     (ud.speedrunCategoriesMet & 0x4) ? "(NoDMG)" : "",
                     /*(ud.speedrunCategoriesMet & 0x8) ? "(Pacifist)" :*/ "");
             minitext(minitext_x, minitext_y, tempbuf, 0, 26);
@@ -10988,9 +10993,9 @@ void dobonus(char bonusonly)
                     }
 					
                     sprintf(tempbuf,"%s%s%s",
-                            (ud.speedrunCategoriesMet == 0x3) ? "Max%" :
-                            (ud.speedrunCategoriesMet == 0x2) ? "100%" :
-                            (ud.speedrunCategoriesMet == 0x1) ? "100S" : "Any%",
+                            ((ud.speedrunCategoriesMet & 0x3) == 0x3) ? "Max%" :
+                            (ud.speedrunCategoriesMet & 0x2) ? "100%" :
+                            (ud.speedrunCategoriesMet & 0x1) ? "100S" : "Any%",
                             (ud.speedrunCategoriesMet & 0x4) ? "(NoDMG)" : "",
                             /*(ud.speedrunCategoriesMet & 0x8) ? "(Pacifist)" : */"");
                     gametext((320>>2)+71,yy+9,tempbuf,0,2+8+16); yy+=10;
