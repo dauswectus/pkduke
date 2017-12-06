@@ -1335,7 +1335,6 @@ void GUI::Render() {
         m_menu->GetCurrentPage(m_context)->Hide();
     }
 
-    //POGO: if demo mode is set and menu mode is not set we can end up with a menuing bug here if we're in intermission mode (recstat==4)
     if (m_enabled || (dnDemoModeSet() && !dnMenuModeSet() && ud.recstat == 4)) {
         GL_SetUIMode(m_width, m_height, m_menu_scale, m_menu_offset_x, m_menu_offset_y);
 

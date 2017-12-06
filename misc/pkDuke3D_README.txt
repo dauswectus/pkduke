@@ -7,28 +7,36 @@ $$$$$$ $$ $$$$$$ | PP  \ P| KKKKKK/| DD  | D| UU  | U| KKKKKK/| EEEEEEEE |___  3
   $$$      $$$   | PPPPPPP| KK \  K| DDDDDDD|  UUUUUU| KK \  K|  EEEEEE|  333333| DDDDDDD/    $$$      $$$   
     $$$$$$$$     | PP____/|__/  \__|_______/ \______/|__/  \__/\_______/\______/|_______/       $$$$$$$$     
                  | PP                                                                                        
-                 | PP                                                     (Version 1.1.1)                      
+                 | PP                                                     (Version 1.2 RC)                      
                  |__/                                                                                        
 
 
   Thanks for downloading and installing pkDuke3D! :)
   
-  This major release (1.1) adds various improvements, including an accurate Game-Time timer
-   (classic Duke's game timer is now labelled "Classic").
-  The accurate in-game time allows for a very consistent comparison against other runs
-   without the caveats associated with real-time timing (such as lag/frame timing jitter being included in real-time).
-  Additionally, various improvements have been added & bugs fixed (including an unfortunate timing bug related to menu buffering).
+  This major release candidate (1.2 RC) fixes a number of bugs.
+  Most notable fixes are for a variety of stability bugs that were carried over from Megaton 1.3.2 and its ancestor jfDuke3D.
+  Bugs fixed include:
+   +fixed cutscene crash that occured after cutscenes were played enough times in a session (caused by a linear cache leak)
+   +fixed the black screen soft-lock issue when escape is held or rammed when transitioning levels
+   +fixed game timer overflow soft-lock issues (the ~10 hour session soft-lock)
+   +fixed menu sometimes showing over top of the cinematics during demo intermissions
+   +fixed issue where the total timers could get clobbered while transitioning episodes mid-session if continuous demos played more than one level on the menu
+   +fixed speedrunCategoriesMet bug introduced in 1.1.1 which was causing it to display incorrectly on the level stats and end of level screens
+      (it's worth noting that this bug prompted me to remove the download for version 1.1.1 from BitBucket shortly after release)
+   +fixed console to open and close properly
+   +fixed console to allow for re-binding of the console key
+   +fixed console pausing when opened to work properly
+   +never recenter the window (allows repositioning the pkDuke3D window)
   
-  This minor update (1.1.1) improves the Game-Time timer further, keeping it running even when the player is dead or frozen
+  This follows minor update (1.1.1) which improved the Game-Time timer further, keeping it running even when the player is dead or frozen
    (which was an issue with Duke3D's original game timer).
   A full changelog can be seen in the commit history on BitBucket.
   
-  This release should be reasonably stable.
-  Again, I would still highly recommend recording videos/livestreaming in addition to recording DMOs, just to be safe!
-  Although it shouldn't happen, if your demos ever desync, please send them to me & I can use them to improve pkDuke3D
-   (and potentially fix the demo in the process :) )
+  This is a release candidate -- while I do recommend updating to this given the number of issues fixed,
+   this version has yet to be tested for the significant amount of time necessary for me to consider it assuredly stable.
+  If you are recording a demo, please be cautious to also record a video for safety.
   
-  This version includes improvements suggested by fellow Duke speedrunners;
+  This update has been a long-time coming & includes improvements suggested by fellow Duke speedrunners;
    special thanks to everyone for testing & suggesting improvements!
   Again, please let me know if you run into any issues or have suggestions, and I'll be sure to get them into a new version! :)
    ~pogokeen
@@ -63,7 +71,8 @@ If you are creating a shortcut to pkDuke3d.exe (in Windows/Steam), be certain to
 
 How To Use:
 
-Simply run pkDuke3D.exe from within the gameroot folder.
+pkDuke3D.exe must be run with the "gameroot" folder as the present working directory!
+Otherwise, it will complain about not finding TABLES.DAT.
 
 To quick-start, execute "bin/pkDuke3d_play.bat" to jump straight into the game.
 You can also use "bin/pkDuke3d_gamerootCMD.bat" to open a command-prompt from the gameroot folder.
@@ -127,7 +136,11 @@ Command Line Help (A List of The Command-Line Switches For pkDuke3D):
 
 Legal:
 
-pkDuke3D Modifications are Copyright (C) 2014-2016 Alex "pogokeen" Dawson
+"Build Engine & Tools" Copyright (c) 1993-1997 Ken Silverman
+Ken Silverman's official web site: "http://www.advsys.net/ken"
+See the included license file "BUILDLIC.TXT" for license info.
+
+pkDuke3D Modifications are Copyright (C) 2014-2017 Alex "pogokeen" Dawson
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
