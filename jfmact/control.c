@@ -1317,7 +1317,7 @@ void dnBindFunction(int function, int slot, dnKey key) {
 
     if (function == gamefunc_Show_Console)
     {
-        OSD_CaptureKey(key, slot);
+        OSD_CaptureKey(dnTranslateSDLKey(key), slot);
     }
 }
 
