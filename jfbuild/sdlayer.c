@@ -237,6 +237,10 @@ int initsystem(void)
 		linked->major, linked->minor, linked->patch,
 		compiled.major, compiled.minor, compiled.patch);
 
+#ifdef _WIN32
+    putenv("SDL_VIDEODRIVER=directx");
+#endif
+
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER
 #ifdef NOSDLPARACHUTE
 			| SDL_INIT_NOPARACHUTE
@@ -1434,7 +1438,6 @@ int handleevents(void)
                 break;
 
 			case SDL_MOUSEMOTION:
-                //POGOTODO: re-evaluate this alongside the intermittent focus gain loss idea for Cube's mouse issue
                 if (0 && skip_next_motion) {
                     skip_next_motion = 0;
                 } else {
