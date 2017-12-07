@@ -56,7 +56,7 @@ Modifications for JonoF's port by Jonathon Fowler(jf@jonof.id.au)
 
 #include "_control.h"
 
-#define VERSION "pkDuke3D 1.2RC (Megaton 1.3.2)"
+#define VERSION "pkDuke3D 1.2 (Megaton 1.3.2)"
 
 #define HEAD   "Duke Nukem 3D Unregistered Shareware "VERSION
 

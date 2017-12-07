@@ -7,15 +7,16 @@ $$$$$$ $$ $$$$$$ | PP  \ P| KKKKKK/| DD  | D| UU  | U| KKKKKK/| EEEEEEEE |___  3
   $$$      $$$   | PPPPPPP| KK \  K| DDDDDDD|  UUUUUU| KK \  K|  EEEEEE|  333333| DDDDDDD/    $$$      $$$   
     $$$$$$$$     | PP____/|__/  \__|_______/ \______/|__/  \__/\_______/\______/|_______/       $$$$$$$$     
                  | PP                                                                                        
-                 | PP                                                     (Version 1.2 RC)                      
+                 | PP                                                     (Version 1.2)                      
                  |__/                                                                                        
 
 
   Thanks for downloading and installing pkDuke3D! :)
   
-  This major release candidate (1.2 RC) fixes a number of bugs.
+  This major release (1.2) fixes a number of bugs.
   Most notable fixes are for a variety of stability bugs that were carried over from Megaton 1.3.2 and its ancestor jfDuke3D.
-  Bugs fixed include:
+  Fixes and improvements include:
+   +switched the SDL back-end to use DirectX instead of windib.  This fixes intermittent mouse movement issues on some computers and may improve performance.
    +fixed cutscene crash that occured after cutscenes were played enough times in a session (caused by a linear cache leak)
    +fixed the black screen soft-lock issue when escape is held or rammed when transitioning levels
    +fixed game timer overflow soft-lock issues (the ~10 hour session soft-lock)
@@ -32,9 +33,7 @@ $$$$$$ $$ $$$$$$ | PP  \ P| KKKKKK/| DD  | D| UU  | U| KKKKKK/| EEEEEEEE |___  3
    (which was an issue with Duke3D's original game timer).
   A full changelog can be seen in the commit history on BitBucket.
   
-  This is a release candidate -- while I do recommend updating to this given the number of issues fixed,
-   this version has yet to be tested for the significant amount of time necessary for me to consider it assuredly stable.
-  If you are recording a demo, please be cautious to also record a video for safety.
+  If you are recording a demo, please still be cautious to also record a video for the sake of safety.
   
   This update has been a long-time coming & includes improvements suggested by fellow Duke speedrunners;
    special thanks to everyone for testing & suggesting improvements!
