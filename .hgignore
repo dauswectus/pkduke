@@ -3,7 +3,6 @@ Debug/
 Release/
 testroot/
 steamworks_sdk_130/
-thirdparty/bin-win32/
 duke3d/Debug_NOSTEAM/
 pkDuke3d.sdf
 pkDuke3d.v12.suo
