@@ -1,0 +1,11 @@
+Debug/
+Debug_NOSTEAM/
+Release/
+steamworks_sdk_148/
+thirdparty/bin-win32/
+duke3d/duke3d.vcxproj.user
+pkDuke3d.sdf
+pkDuke3d.v12.suo
+pkduke3d.suo
+duke3d.sdf
+thirdparty/bin-win32/
