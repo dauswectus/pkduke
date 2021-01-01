@@ -10,3 +10,6 @@ pkduke3d.suo
 duke3d.sdf
 thirdparty/bin-win32/
 thirdparty/
+duke3d/duke3d.log
+thirdparty/sources/libRocket/Build/Rocket.sln
+*.vcxproj
