@@ -13,3 +13,4 @@ thirdparty/
 duke3d/duke3d.log
 thirdparty/sources/libRocket/Build/Rocket.sln
 *.vcxproj
+pkduke3d.opensdf
