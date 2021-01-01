@@ -2901,6 +2901,8 @@ void displayrest(long smoothratio)
 
             sprintf(tempbuf, "FPS: %d", dnFPS);
             minitext(minitext_x,minitext_y+6+6+6+6+6+6,tempbuf,0,26);
+			sprintf(tempbuf, "Test version (Daus)");
+			minitext(minitext_x, minitext_y + 6 + 6 + 6 + 6 + 6 + 6 + 6, tempbuf, 0, 26);
             
             sprintf(tempbuf, "Rec: %s", ud.recstat == 1 ? "IL" : ud.recstat == 3 ? "CN" : "OFF");
             minitext(minitext_x, minitext_y+6+6+6+6+6, tempbuf, 0, 26);
