@@ -6901,9 +6901,6 @@ void fn_gamefuncs(void){
         }
 
 		if (BUTTON(gamefunc_TurnAround)) {
-			char str[4];
-			sprintf(str, "%d", SelectedLevel);
-			adduserquote(str);
 			ud.m_volume_number = SelectedEpisode;
 			ud.m_level_number = SelectedLevel;
 			ud.m_monsters_off = ud.monsters_off = 0;
