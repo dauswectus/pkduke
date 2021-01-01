@@ -2049,7 +2049,7 @@ if (!VOLUMEONE) {
     loc.bits |=   BUTTON(gamefunc_Jetpack)<<25;
     loc.bits |=   (((long)gamequit)<<26);
     loc.bits |=   BUTTON(gamefunc_Inventory_Right)<<27;
-    loc.bits |=   BUTTON(gamefunc_TurnAround)<<28;
+    //loc.bits |=   BUTTON(gamefunc_TurnAround)<<28;
     loc.bits |=   BUTTON(gamefunc_Open)<<29;
     //if (((ps[myconnectindex].gm&MODE_TYPE) != MODE_TYPE) && ((ps[myconnectindex].gm&MODE_SENDTOWHOM) != MODE_SENDTOWHOM))
     loc.bits |=   BUTTON(gamefunc_Inventory)<<30;

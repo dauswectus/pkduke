@@ -56,7 +56,7 @@ Modifications for JonoF's port by Jonathon Fowler(jf@jonof.id.au)
 
 #include "_control.h"
 
-#define VERSION "pkDuke3D 1.2 (Megaton 1.3.2)"
+#define VERSION "(Daus) pkDuke3D 1.2 (Megaton 1.3.2)"
 
 #define HEAD   "Duke Nukem 3D Unregistered Shareware "VERSION
 
@@ -6899,11 +6899,38 @@ void fn_gamefuncs(void){
             BUTTONCLEAR(gamefunc_Quit_Game);
             GUI_ShowQuitConfirmation();
         }
+
+		if (BUTTON(gamefunc_TurnAround)) {
+			char str[4];
+			sprintf(str, "%d", SelectedLevel);
+			adduserquote(str);
+			ud.m_volume_number = SelectedEpisode;
+			ud.m_level_number = SelectedLevel;
+			ud.m_monsters_off = ud.monsters_off = 0;
+			ud.player_skill = SelectedSkill;
+
+			ud.m_respawn_items = 0;
+			ud.m_respawn_inventory = 0;
+
+			ud.multimode = 1;
+			ud.m_recstat = 0;
+
+			ud.totaltime = 0;
+			ud.accuratetime = 0;
+			ud.accuratetotaltime = 0;
+			ud.realtime = 0;
+			ud.realtotaltime = 0;
+
+			newgame(ud.m_volume_number, ud.m_level_number, ud.m_player_skill);
+			if (enterlevel(MODE_GAME)) backtomenu();
+			BUTTONCLEAR(gamefunc_TurnAround);
+		}
         
         if (BUTTON(gamefunc_Video_Menu)) {
             BUTTONCLEAR(gamefunc_Video_Menu);
             GUI_ShowVideoSettingsMenu();
         }
+		
     }
     
 }

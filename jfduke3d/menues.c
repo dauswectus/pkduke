@@ -5428,7 +5428,7 @@ void dnNewGame(GameDesc *gamedesc) {
     ud.startedepisode |= 1 << gamedesc->volume;
     ud.lastclock = getticks();
     
-	ud.m_player_skill		= gamedesc->player_skill;
+	SelectedSkill = ud.m_player_skill		= gamedesc->player_skill;
 	ud.m_respawn_monsters	= gamedesc->respawn_monsters;
 	ud.m_monsters_off		= ud.monsters_off = gamedesc->monsters_off;
 
@@ -5448,8 +5448,8 @@ void dnNewGame(GameDesc *gamedesc) {
 	/*g_DemoData.Header.SessionMultiMode	= ud.multimode;*/
 	playerswhenstarted					= ud.multimode;
 
-	ud.m_volume_number		= gamedesc->volume;
-	ud.m_level_number		= gamedesc->level;
+	SelectedEpisode = ud.m_volume_number		= gamedesc->volume;
+	SelectedLevel = ud.m_level_number		= gamedesc->level;
 
 	ud.m_marker				= gamedesc->marker;
 

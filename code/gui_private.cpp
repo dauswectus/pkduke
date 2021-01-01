@@ -435,7 +435,13 @@ void GUI::LoadDocuments() {
     LoadDocument("data/loadgame.rml");
     LoadDocument("data/savegame.rml");
 	LoadDocument("data/skill.rml");
+	LoadDocument("data/il_skill.rml");
 	LoadDocument("data/episodes.rml");
+	LoadDocument("data/ilepisodes.rml");
+	LoadDocument("data/ile1.rml");
+	LoadDocument("data/ile2.rml");
+	LoadDocument("data/ile3.rml");
+	LoadDocument("data/ile4.rml");
 	LoadDocument("data/video.rml");
 	LoadDocument("data/game.rml");
 	LoadDocument("data/sound.rml");
@@ -1793,6 +1799,54 @@ void GUI::ReadChosenSkillAndEpisode(int *pskill, int *pepisode) {
     assert(false);
 }
 
+void GUI::ReadChosenSkillAndEpisode(int *pskill, int *pepisode, int *pslevel) {
+	Rocket::Core::Element *skill = m_menu->GetHighlightedItem(m_context, "il-menu-skill");
+	assert(skill != NULL);
+	sscanf(skill->GetId().CString(), "skill-%d", pskill);
+	if (dnGetAddonId() != 0) {
+		*pepisode = dnGetAddonEpisode();
+		return;
+	}
+	else {
+		Rocket::Core::Element *episode = m_menu->GetHighlightedItem(m_context, "il-menu-episodes");
+			assert(episode != NULL);
+			sscanf(episode->GetId().CString(), "episode-%d", pepisode);
+			switch (*pepisode)
+			{
+			case 0:
+			{
+				Rocket::Core::Element *level = m_menu->GetHighlightedItem(m_context, "il-e1-1");
+				assert(level != NULL);
+				sscanf(level->GetId().CString(), "level-%d", pslevel);
+				break;
+			}
+			case 1:
+			{
+				Rocket::Core::Element *level = m_menu->GetHighlightedItem(m_context, "il-e1-2");
+				assert(level != NULL);
+				sscanf(level->GetId().CString(), "level-%d", pslevel);
+				break;
+			}
+			case 2:
+			{
+				Rocket::Core::Element *level = m_menu->GetHighlightedItem(m_context, "il-e1-3");
+				assert(level != NULL);
+				sscanf(level->GetId().CString(), "level-%d", pslevel);
+				break;
+			}
+			case 3:
+			{
+				Rocket::Core::Element *level = m_menu->GetHighlightedItem(m_context, "il-e1-4");
+				assert(level != NULL);
+				sscanf(level->GetId().CString(), "level-%d", pslevel);
+				break;
+			}
+		}
+		return;
+	}
+	assert(false);
+}
+
 Uint32 InviteFriends_TimerCallback(Uint32 interval, void* param) {
     SDL_Event event = { 0 };
     event.type = SDL_USEREVENT;
@@ -1805,21 +1859,32 @@ Uint32 InviteFriends_TimerCallback(Uint32 interval, void* param) {
 bool GUI::DoCommand(Rocket::Core::Element *element, const Rocket::Core::String& command) {
 //	Sys_DPrintf("[GUI ] Command: %s\n", command.CString());
     bool result = true;
-	
+
 	if ( m_messageBoxManager->doCommand( element, command ) ) {
 		return true;
 	}
-	
+
 	if (command == "game-start") {
-		int skill, episode;
+		int skill, episode, level;
 		ReadChosenSkillAndEpisode(&skill, &episode);
+		Enable(false);
+		ps[myconnectindex].gm &= ~MODE_MENU;
+		//POGOFIX: this fixes the menu showing over top of the cinematics during the demo intermissions
+		ps[myconnectindex].gm &= ~MODE_DEMO;
+		m_menu->ShowDocument(m_context, "menu-ingame", false);
+		// for usermap level should be 7 and episode should be 0
+		NewGame(skill, episode, (dnIsUserMap() ? 7 : 0));
+	}
+	else if (command == "il-game-start") {
+		int skill, episode, level;
+		ReadChosenSkillAndEpisode(&skill, &episode, &level);
 		Enable(false);
         ps[myconnectindex].gm &= ~MODE_MENU;
         //POGOFIX: this fixes the menu showing over top of the cinematics during the demo intermissions
         ps[myconnectindex].gm &= ~MODE_DEMO;
 		m_menu->ShowDocument(m_context, "menu-ingame", false);
         // for usermap level should be 7 and episode should be 0
-		NewGame(skill, episode, (dnIsUserMap() ? 7 : 0));
+		NewGame(skill, episode, (dnIsUserMap() ? 7 : level));
 	} else if (command == "game-quit") {
         QuitGameCommand(element);
     } else if (command == "game-quit-immediately") {
@@ -2162,7 +2227,12 @@ void GUI::DidOpenMenuPage(Rocket::Core::ElementDocument *menu_page) {
         InitUserMapsPage(page_id.CString());
     } else if (page_id == "menu-episodes") {
         dnSetUserMap(NULL);
-    } else if (page_id == "menu-multiplayer-join") {
+    } 
+	else if (page_id == "il-menu-episodes") 
+	{
+		dnSetUserMap(NULL);
+	}
+	else if (page_id == "menu-multiplayer-join") {
         InitLobbyList(menu_page);
     } else if (page_id == "menu-multiplayer-maps") {
         InitMpMapsPage(menu_page);

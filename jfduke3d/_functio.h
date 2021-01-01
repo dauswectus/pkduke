@@ -105,6 +105,7 @@ char * gamefunctions[] =
    "Video_Menu",
    "Quit_Game",
    "Game_Menu",
+   "Restart_Map",
 
    };
 #endif
@@ -166,7 +167,8 @@ static char * keydefaults[] =
    "Quick_Kick", "`", "",
    "Next_Weapon", "'", "$mouse4",
    "Previous_Weapon", ";", "$mouse5",
-   "Show_Console", "", ""
+   "Show_Console", "", "",
+   "Restart_Map", "F12", ""
    };
 
 

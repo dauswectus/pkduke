@@ -60,6 +60,9 @@ int32 UseJoystick = 0, UseMouse = 1;
 int32 RunMode = 1;
 int32 AutoAim;	// JBF 20031125
 int32 ShowOpponentWeapons;
+int32 SelectedLevel;
+int32 SelectedEpisode;
+int32 SelectedSkill;
 
 // JBF 20031211: Store the input settings because
 // (currently) jmact can't regurgitate them
@@ -241,6 +244,8 @@ void CONFIG_SetDefaults( void )
     show_mutiplayer_info = 1;
     
 	ShowOpponentWeapons = 0;
+	SelectedLevel = 0;
+	SelectedEpisode = 0;
 	Bstrcpy(ud.rtsname, "DUKE.RTS");
 	Bstrcpy(myname, "Duke");
 

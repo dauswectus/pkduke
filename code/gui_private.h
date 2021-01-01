@@ -82,6 +82,7 @@ private:
 	void SetChosenMode(const VideoMode *mode);
 	void UpdateApplyStatus();
 	void ReadChosenSkillAndEpisode(int *skill, int *episode);
+	void ReadChosenSkillAndEpisode(int *skill, int *episode, int *level);
     void Poll();
     
     void SetActionToConfirm(ConfirmableAction *action);

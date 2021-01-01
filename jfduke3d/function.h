@@ -109,6 +109,7 @@ enum
    gamefunc_Video_Menu,
    gamefunc_Quit_Game,
    gamefunc_Game_Menu,
+   gamefunc_Restart_Map,
    };
 #ifdef __cplusplus
 };

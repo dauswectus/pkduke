@@ -65,9 +65,10 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\bin</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
@@ -88,8 +89,8 @@
     <ClCompile>
       <AdditionalOptions>/J %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)/steamworks_sdk_130/public/;$(SolutionDir)/steamworks_sdk_130/public/steam;$(Solutiondir)/code/rocket;$(SolutionDir)/code;$(SolutionDir)/jfduke3d;$(SolutionDir)/jfbuild;$(SolutionDir)/jfaudiolib;$(SolutionDir)/jfmact;$(SolutionDir)/thirdparty/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;SUPERBUILD=1;POLYMOST=1;USE_OPENGL=1;DYNAMIC_OPENGL=1;KSFORBUILD=1;RENDERTYPESDL=1;HAVE_SDL=1;ENGINE_USING_A_C=1a;NOASM=1;NOCOPYPROTECT=1;GLGUARD=0;STATIC_LIB;STEAM_OVERLAY_WORKAROUND=0;HAVE_VORBIS=1;WIDESCREEN_HACK=1;FONT_HACK=1;NOSTEAM=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)/steamworks_sdk_148/sdk/public/;$(SolutionDir)/steamworks_sdk_148/sdk/public/steam;$(Solutiondir)/code/rocket;$(SolutionDir)/code;$(SolutionDir)/jfduke3d;$(SolutionDir)/jfbuild;$(SolutionDir)/jfaudiolib;$(SolutionDir)/jfmact;$(SolutionDir)/thirdparty/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;SUPERBUILD=1;POLYMOST=1;USE_OPENGL=1;DYNAMIC_OPENGL=1;KSFORBUILD=1;RENDERTYPESDL=1;HAVE_SDL=1;ENGINE_USING_A_C=1a;NOASM=1;NOCOPYPROTECT=1;GLGUARD=0;STATIC_LIB;STEAM_OVERLAY_WORKAROUND=0;HAVE_VORBIS=1;WIDESCREEN_HACK=1;FONT_HACK=1;NOSTEAM=1;_ITERATOR_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -99,7 +100,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>RocketCore.lib;RocketControls.lib;RocketDebugger.lib;ws2_32.lib;opengl32.lib;glu32.lib;winmm.lib;SDL.lib;SDLmain.lib;steam_api.lib;libcmtd.lib;libcpmtd.lib;freetype2411MT_D.lib;dsound.lib;dinput.lib;ddraw.lib;dxguid.lib;dxerr.lib;oldnames.lib;libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;vpxmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)/thirdparty/sources/dxsdk/lib/;$(SolutionDir)/thirdparty/bin-win32/$(Configuration);$(SolutionDir)/steamworks_sdk_130/redistributable_bin;$(SolutionDir)/steamworks_sdk_130/public/steam/lib/win32;$(SolutionDir)/thirdparty/bin-win32/;$(SolutionDir)/thirdparty/sources/support/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/thirdparty/sources/dxsdk/lib/;$(SolutionDir)/thirdparty/bin-win32/$(Configuration);$(SolutionDir)/steamworks_sdk_148/sdk/redistributable_bin;$(SolutionDir)/steamworks_sdk_148/sdk/public/steam/lib/win32;$(SolutionDir)/thirdparty/bin-win32/;$(SolutionDir)/thirdparty/sources/support/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -110,7 +111,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalOptions>/J %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/steamworks_sdk_130/public/;$(SolutionDir)/steamworks_sdk_130/public/steam;$(Solutiondir)/code/rocket;$(SolutionDir)/code;$(SolutionDir)/jfduke3d;$(SolutionDir)/jfbuild;$(SolutionDir)/jfaudiolib;$(SolutionDir)/jfmact;$(SolutionDir)/thirdparty/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/steamworks_sdk_148/sdk/public/;$(SolutionDir)/steamworks_sdk_148/sdk/public/steam;$(Solutiondir)/code/rocket;$(SolutionDir)/code;$(SolutionDir)/jfduke3d;$(SolutionDir)/jfbuild;$(SolutionDir)/jfaudiolib;$(SolutionDir)/jfmact;$(SolutionDir)/thirdparty/include;C:\Users\Szami-PC\Documents\GitHub\pkduke\thirdparty\bin-win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;SUPERBUILD=1;POLYMOST=1;USE_OPENGL=1;DYNAMIC_OPENGL=1;KSFORBUILD=1;RENDERTYPESDL=1;HAVE_SDL=1;ENGINE_USING_A_C=1a;NOASM=1;NOCOPYPROTECT=1;GLGUARD=0;STATIC_LIB;STEAM_OVERLAY_WORKAROUND=1;HAVE_VORBIS=1;WIDESCREEN_HACK=1;FONT_HACK=1;_NDEBUG=1;NDEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -126,7 +127,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>RocketCore.lib;RocketControls.lib;RocketDebugger.lib;ws2_32.lib;opengl32.lib;glu32.lib;winmm.lib;SDL.lib;SDLmain.lib;steam_api.lib;libcmt.lib;libcpmt.lib;freetype2411MT.lib;dsound.lib;dinput.lib;ddraw.lib;dxguid.lib;dxerr.lib;oldnames.lib;libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;vpxmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)/thirdparty/sources/dxsdk/lib/;$(SolutionDir)/thirdparty/bin-win32/$(Configuration);$(SolutionDir)/steamworks_sdk_130/redistributable_bin;$(SolutionDir)/steamworks_sdk_130/public/steam/lib/win32;$(SolutionDir)/thirdparty/bin-win32/;$(SolutionDir)/thirdparty/sources/support/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/thirdparty/sources/dxsdk/lib/;$(SolutionDir)/thirdparty/bin-win32/$(Configuration);$(SolutionDir)/steamworks_sdk_148/sdk/redistributable_bin;$(SolutionDir)/steamworks_sdk_148/sdk/public/steam/lib/win32;$(SolutionDir)/thirdparty/bin-win32/;$(SolutionDir)/thirdparty/sources/libRocket/bin;$(SolutionDir)/thirdparty/sources/support/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -140,8 +141,8 @@
     <ClCompile>
       <AdditionalOptions>/J %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)/steamworks_sdk_126/public/steam;$(Solutiondir)/code/rocket;$(SolutionDir)/code;$(SolutionDir)/jfduke3d;$(SolutionDir)/jfbuild;$(SolutionDir)/jfaudiolib;$(SolutionDir)/jfmact;$(SolutionDir)/thirdparty/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;SUPERBUILD=1;POLYMOST=1;USE_OPENGL=1;DYNAMIC_OPENGL=1;KSFORBUILD=1;RENDERTYPESDL=1;HAVE_SDL=1;ENGINE_USING_A_C=1a;NOASM=1;NOCOPYPROTECT=1;GLGUARD=0;STATIC_LIB;STEAM_OVERLAY_WORKAROUND=1;HAVE_VORBIS=1;WIDESCREEN_HACK=1;NOSTEAM=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)/steamworks_sdk_148/sdk/public/steam;$(Solutiondir)/code/rocket;$(SolutionDir)/code;$(SolutionDir)/jfduke3d;$(SolutionDir)/jfbuild;$(SolutionDir)/jfaudiolib;$(SolutionDir)/jfmact;$(SolutionDir)/thirdparty/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;SUPERBUILD=1;POLYMOST=1;USE_OPENGL=1;DYNAMIC_OPENGL=1;KSFORBUILD=1;RENDERTYPESDL=1;HAVE_SDL=1;ENGINE_USING_A_C=1a;NOASM=1;NOCOPYPROTECT=1;GLGUARD=0;STATIC_LIB;STEAM_OVERLAY_WORKAROUND=1;HAVE_VORBIS=1;WIDESCREEN_HACK=1;NOSTEAM=1;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -151,7 +152,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>RocketCore.lib;RocketControls.lib;RocketDebugger.lib;ws2_32.lib;opengl32.lib;glu32.lib;winmm.lib;SDL.lib;SDLmain.lib;steam_api.lib;libcmtd.lib;libcpmtd.lib;freetype2411MT_D.lib;dsound.lib;dinput.lib;ddraw.lib;dxguid.lib;oldnames.lib;libogg_static.lib;libvorbis_static.lib;libvorbisfile_static.lib;vpxmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)/thirdparty/bin-win32/Debug;$(SolutionDir)/steamworks_sdk_126/redistributable_bin;$(SolutionDir)/steamworks_sdk_126/public/steam/lib/win32;$(SolutionDir)/thirdparty/sources/dxsdk/lib;$(SolutionDir)/thirdparty/sources/support/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/thirdparty/bin-win32;$(SolutionDir)/thirdparty/bin-win32/Debug;$(SolutionDir)/steamworks_sdk_148/sdk/redistributable_bin;$(SolutionDir)/steamworks_sdk_148/sdk/public/steam/lib/win32;$(SolutionDir)/thirdparty/sources/dxsdk/lib;$(SolutionDir)/thirdparty/sources/support/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -163,7 +164,7 @@
       <AdditionalOptions>/J %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)/steamworks_sdk_122/public/steam;$(Solutiondir)/code/rocket;$(SolutionDir)/code;$(SolutionDir)/jfduke3d;$(SolutionDir)/jfbuild;$(SolutionDir)/jfaudiolib;$(SolutionDir)/jfmact;$(SolutionDir)/thirdparty/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;SUPERBUILD=1;POLYMOST=1;USE_OPENGL=1;DYNAMIC_OPENGL=1;KSFORBUILD=1;RENDERTYPESDL=1;HAVE_SDL=1;ENGINE_USING_A_C=1a;NOASM=1;NOCOPYPROTECT=1;GLGUARD=0;STATIC_LIB;STEAM_OVERLAY_WORKAROUND=1;HAVE_VORBIS=1;NOSTEAM=1;CLASSIC_MENU=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_WINDOWS;SUPERBUILD=1;POLYMOST=1;USE_OPENGL=1;DYNAMIC_OPENGL=1;KSFORBUILD=1;RENDERTYPESDL=1;HAVE_SDL=1;ENGINE_USING_A_C=1a;NOASM=1;NOCOPYPROTECT=1;GLGUARD=0;STATIC_LIB;STEAM_OVERLAY_WORKAROUND=1;HAVE_VORBIS=1;NOSTEAM=1;CLASSIC_MENU=1;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
